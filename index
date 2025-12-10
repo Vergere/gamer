@@ -1,1 +1,1042 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Number Match Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* THEME VARIABLES
+       Light is default in :root; dark overrides via body.dark-mode.
+    */
+
+    :root {
+      /* Light theme defaults */
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --right: #16a34a;
+      --wrong: #dc2626;
+      --card-bg: #ffffff;
+      --overlay-bg: rgba(249, 250, 251, 0.96);
+      --overlay-panel-bg: #ffffff;
+      --overlay-border: #e5e7eb;
+      --button-bg: #f9fafb;
+      --button-border: #d1d5db;
+    }
+
+    body.dark-mode {
+      --bg: #0f172a;
+      --panel: #020617;
+      --border: #1f2937;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --right: #4ade80;
+      --wrong: #f97373;
+      --card-bg: #1e293b;
+      --overlay-bg: rgba(15, 23, 42, 0.9);
+      --overlay-panel-bg: #020617;
+      --overlay-border: #1f2937;
+      --button-bg: #0b1120;
+      --button-border: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, var(--bg) 55%, #020617 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 12px;
+      transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    body {
+      background: var(--bg);
+    }
+
+    #game {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+      background: var(--panel);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+      padding: 14px 12px 16px;
+    }
+
+    /* Top bar: title + theme toggle */
+
+    #top-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    #top-bar-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    #theme-toggle {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--button-border);
+      background: var(--button-bg);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #theme-toggle:active {
+      transform: translateY(1px);
+    }
+
+    /* PRE‑TRIAL SETUP (home screen) */
+
+    #setup-screen {
+      margin-top: 8px;
+    }
+
+    #settings {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .setting-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    #settings label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #settings input[type="number"] {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    body.dark-mode #settings input[type="number"] {
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    #btn-start {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    #btn-start:active {
+      transform: translateY(1px);
+    }
+
+    /* Last-session stats on home screen */
+    #session-stats {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* GAME SCREEN */
+
+    #game-screen {
+      margin-top: 8px;
+      display: none;
+    }
+
+    #cards {
+      margin: 14px 0 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .card-wrapper {
+      position: relative;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--card-bg); /* pure solid */
+      border-radius: 12px;
+      padding: 22px 10px 18px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 600;
+      text-align: center;
+      min-height: 80px;
+    }
+
+    #buttons {
+      display: flex;
+      gap: 10px;
+      margin: 6px 0 8px;
+    }
+
+    #buttons button {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--button-bg);
+      color: var(--text-main);
+    }
+
+    #btn-same {
+      background: linear-gradient(135deg, var(--accent), #22c55e);
+      color: #0b1120;
+      border-color: transparent;
+    }
+
+    #buttons button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
+    }
+
+    #status-row {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    #score {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #score strong {
+      color: var(--accent);
+    }
+
+    #accuracy,
+    #time span,
+    #round {
+      font-variant-numeric: tabular-nums;
+    }
+
+    #feedback {
+      margin-top: 6px;
+      min-height: 1.2em;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    #feedback.correct {
+      color: var(--right);
+    }
+
+    #feedback.incorrect {
+      color: var(--wrong);
+    }
+
+    /* neutral stats inside feedback (average line) */
+    #feedback .neutral-stats {
+      color: var(--text-main);
+      font-weight: 400;        /* NOT bold */
+    }
+
+    /* Back to home button (always at bottom during game) */
+    #btn-home {
+      margin-top: 10px;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--button-border);
+      background: var(--button-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    #btn-home:active {
+      transform: translateY(1px);
+    }
+
+    /* RULE OVERLAY: centered, pre-round only */
+
+    #rule-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--overlay-bg);
+      display: none;   /* shown only between rounds */
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      z-index: 10;
+    }
+
+    #rule-overlay-box {
+      max-width: 260px;
+      margin: 0 auto;
+      padding: 16px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--overlay-border);
+      background: var(--overlay-panel-bg);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    #rule-overlay-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    #rule-overlay-text {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    #rule-overlay-round {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    @media (min-width: 640px) {
+      #game {
+        padding: 16px 16px 18px;
+      }
+      .card {
+        min-height: 90px;
+        font-size: 2.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="top-bar">
+      <div id="top-bar-main">
+        <h1>Number Match</h1>
+        <p class="subtitle"></p>
+      </div>
+      <button id="theme-toggle" type="button">Dark mode</button>
+    </div>
+
+    <!-- PRE‑TRIAL SETUP (HOME) -->
+    <div id="setup-screen">
+      <div id="settings">
+        <div class="setting-group">
+          <span class="setting-label">Round time</span>
+          <label>
+            <input id="input-round-time" type="number"
+                   min="100" max="600000" step="100" value="1300">
+            <span>ms</span>
+          </label>
+        </div>
+
+        <div class="setting-group">
+          <span class="setting-label">Rounds</span>
+          <label>
+            <input id="input-rounds" type="number"
+                   min="1" max="9999" step="10" value="20">
+          </label>
+        </div>
+
+        <div class="setting-group">
+          <span class="setting-label">Values</span>
+          <label>
+            min
+            <input id="input-min" type="number" min="1" max="3999" value="1">
+          </label>
+          <label>
+            max
+            <input id="input-max" type="number" min="1" max="3999" value="20">
+          </label>
+        </div>
+      </div>
+
+      <!-- Last-session stats (average RT) -->
+      <div id="session-stats"></div>
+
+      <button id="btn-start" type="button">Start</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen">
+      <!-- Centered rule overlay, visible ONLY between rounds -->
+      <div id="rule-overlay">
+        <div id="rule-overlay-box">
+          <div id="rule-overlay-label">Rule</div>
+          <div id="rule-overlay-text">Loading…</div>
+          <div id="rule-overlay-round"></div>
+        </div>
+      </div>
+
+      <div id="cards">
+        <div class="card-wrapper">
+          <div class="card-label">Left</div>
+          <div id="left-card" class="card"></div>
+        </div>
+        <div class="card-wrapper">
+          <div class="card-label">Right</div>
+          <div id="right-card" class="card"></div>
+        </div>
+      </div>
+
+      <div id="buttons">
+        <button id="btn-same" type="button">Same</button>
+        <button id="btn-different" type="button">Different</button>
+      </div>
+
+      <div id="status-row">
+        <div id="score">
+          <span>Score: <strong id="score-value">0</strong></span>
+          <span id="accuracy">(0 / 0)</span>
+        </div>
+        <div id="time">Time: <span id="time-left">–</span></div>
+        <div id="round">Round 0 / 0</div>
+      </div>
+
+      <div id="feedback"></div>
+
+      <!-- Back to Home is always at the bottom on every round -->
+      <button id="btn-home" type="button">Back to Home</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Dynamic representations ----------
+    const GLOBAL_MAX_VALUE = 3999; // Roman-safe max
+    let representations = [];      // rebuilt for each session
+
+    function toRoman(n) {
+      if (n <= 0 || n > GLOBAL_MAX_VALUE) return null;
+      const romans = [
+        ["M", 1000], ["CM", 900], ["D", 500], ["CD", 400],
+        ["C", 100], ["XC", 90], ["L", 50], ["XL", 40],
+        ["X", 10], ["IX", 9], ["V", 5], ["IV", 4], ["I", 1]
+      ];
+      let result = "";
+      let value = n;
+      for (const [sym, val] of romans) {
+        while (value >= val) {
+          result += sym;
+          value -= val;
+        }
+      }
+      return result;
+    }
+
+    const EN_UNDER_20 = [
+      "zero","one","two","three","four","five","six","seven","eight","nine",
+      "ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen",
+      "seventeen","eighteen","nineteen"
+    ];
+    const EN_TENS = [
+      "", "", "twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"
+    ];
+
+    function toEnglish(n) {
+      if (n < 0 || n > 9999) return null;
+      if (n < 20) return EN_UNDER_20[n];
+      if (n < 100) {
+        const tens = Math.floor(n / 10);
+        const rest = n % 10;
+        return rest
+          ? `${EN_TENS[tens]}-${EN_UNDER_20[rest]}`
+          : EN_TENS[tens];
+      }
+      if (n < 1000) {
+        const hundreds = Math.floor(n / 100);
+        const rest = n % 100;
+        const base = `${EN_UNDER_20[hundreds]} hundred`;
+        return rest ? `${base} ${toEnglish(rest)}` : base;
+      }
+      // 1000–9999
+      const thousands = Math.floor(n / 1000);
+      const rest = n % 1000;
+      const base = `${toEnglish(thousands)} thousand`;
+      return rest ? `${base} ${toEnglish(rest)}` : base;
+    }
+
+    const ES_UNDER_16 = [
+      "cero","uno","dos","tres","cuatro","cinco","seis","siete",
+      "ocho","nueve","diez","once","doce","trece","catorce","quince"
+    ];
+    const ES_TENS = [
+      "", "", "veinte","treinta","cuarenta","cincuenta",
+      "sesenta","setenta","ochenta","noventa"
+    ];
+    const ES_HUNDREDS = [
+      "", "ciento","doscientos","trescientos","cuatrocientos",
+      "quinientos","seiscientos","setecientos","ochocientos","novecientos"
+    ];
+
+    function toSpanish(n) {
+      if (n <= 0 || n > 9999) return null;
+      if (n <= 15) return ES_UNDER_16[n];
+      if (n < 20) return "dieci" + ES_UNDER_16[n - 10]; // 16–19
+      if (n === 20) return "veinte";
+      if (n < 30) return "veinti" + ES_UNDER_16[n - 20]; // 21–29
+      if (n < 100) {
+        const tens = Math.floor(n / 10);
+        const rest = n % 10;
+        const base = ES_TENS[tens];
+        return rest ? `${base} y ${ES_UNDER_16[rest]}` : base;
+      }
+      if (n === 100) return "cien";
+      if (n < 1000) {
+        const hundreds = Math.floor(n / 100);
+        const rest = n % 100;
+        const base = ES_HUNDREDS[hundreds];
+        return rest ? `${base} ${toSpanish(rest)}` : base;
+      }
+      if (n === 1000) return "mil";
+      const thousands = Math.floor(n / 1000);
+      const rest = n % 1000;
+      const base = thousands === 1
+        ? "mil"
+        : `${toSpanish(thousands)} mil`;
+      return rest ? `${base} ${toSpanish(rest)}` : base;
+    }
+
+    function buildRepresentations(minValue, maxValue) {
+      representations = [];
+      for (let value = minValue; value <= maxValue; value++) {
+        // Always Arabic
+        representations.push({
+          value,
+          text: String(value),
+          system: "Arabic"
+        });
+
+        const roman = toRoman(value);
+        if (roman) {
+          representations.push({
+            value,
+            text: roman,
+            system: "Roman"
+          });
+        }
+
+        const english = toEnglish(value);
+        if (english) {
+          representations.push({
+            value,
+            text: english,
+            system: "English"
+          });
+        }
+
+        const spanish = toSpanish(value);
+        if (spanish) {
+          representations.push({
+            value,
+            text: spanish,
+            system: "Spanish"
+          });
+        }
+      }
+    }
+
+    // ---------- Config (from setup screen) ----------
+    let configRoundTimeMs = 1300;
+    let configRounds = 20;
+    let configMinValue = 1;
+    let configMaxValue = 20;
+
+    // ---------- Game state ----------
+    let currentPair = null;    // [left, right]
+    let currentRule = "value"; // "value" or "category"
+    let score = 0;
+    let totalTrials = 0;
+    let currentRound = 0;
+    let lockInput = true;
+
+    // RT tracking (for current session only)
+    let trialStartTime = null;
+    let sessionRTs = []; // array of ms for non-timeout responses
+
+    const RULE_PREVIEW_MS = 1000; // rule overlay duration
+
+    let roundTimerId = null;
+    let roundEndAt = 0;
+    let preRoundTimeoutId = null;
+
+    // ---------- DOM refs ----------
+    const body = document.body;
+    const setupScreen = document.getElementById("setup-screen");
+    const gameScreen = document.getElementById("game-screen");
+
+    const roundTimeInput = document.getElementById("input-round-time");
+    const roundsInput = document.getElementById("input-rounds");
+    const minValueInput = document.getElementById("input-min");
+    const maxValueInput = document.getElementById("input-max");
+    const btnStart = document.getElementById("btn-start");
+
+    const leftCardEl = document.getElementById("left-card");
+    const rightCardEl = document.getElementById("right-card");
+    const btnSame = document.getElementById("btn-same");
+    const btnDifferent = document.getElementById("btn-different");
+    const btnHome = document.getElementById("btn-home");
+
+    const scoreValueEl = document.getElementById("score-value");
+    const accuracyEl = document.getElementById("accuracy");
+    const feedbackEl = document.getElementById("feedback");
+    const roundEl = document.getElementById("round");
+    const timeLeftEl = document.getElementById("time-left");
+
+    const ruleOverlay = document.getElementById("rule-overlay");
+    const ruleOverlayText = document.getElementById("rule-overlay-text");
+    const ruleOverlayRound = document.getElementById("rule-overlay-round");
+
+    const sessionStatsEl = document.getElementById("session-stats");
+    const themeToggleBtn = document.getElementById("theme-toggle");
+
+    // ---------- Theme toggle ----------
+    function applyTheme(mode) {
+      if (mode === "dark") {
+        body.classList.add("dark-mode");
+        themeToggleBtn.textContent = "Light mode";
+      } else {
+        body.classList.remove("dark-mode");
+        themeToggleBtn.textContent = "Dark mode";
+      }
+      try {
+        localStorage.setItem("nm-theme", mode);
+      } catch (e) {}
+    }
+
+    (function initTheme() {
+      let saved = null;
+      try {
+        saved = localStorage.getItem("nm-theme");
+      } catch (e) {}
+      if (saved === "dark") applyTheme("dark");
+      else applyTheme("light");  // default is LIGHT
+    })();
+
+    themeToggleBtn.addEventListener("click", () => {
+      const isDark = body.classList.contains("dark-mode");
+      applyTheme(isDark ? "light" : "dark");
+    });
+
+    // ---------- Helpers ----------
+    function randomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
+
+    function pickRandomPair() {
+      const pool = representations;
+      if (pool.length < 2) return null;
+      const i = randomInt(pool.length);
+      let j;
+      do {
+        j = randomInt(pool.length);
+      } while (j === i);
+      return [pool[i], pool[j]];
+    }
+
+    function pickRule() {
+      currentRule = Math.random() < 0.5 ? "value" : "category";
+      if (currentRule === "value") {
+        ruleOverlayText.textContent = "Same VALUE?";
+      } else {
+        ruleOverlayText.textContent = "Same CATEGORY?";
+      }
+    }
+
+    function renderPair() {
+      leftCardEl.textContent = currentPair[0].text;
+      rightCardEl.textContent = currentPair[1].text;
+    }
+
+    function updateScoreboard() {
+      scoreValueEl.textContent = score;
+      accuracyEl.textContent = `(${score} / ${totalTrials})`;
+      roundEl.textContent = `Round ${currentRound} / ${configRounds}`;
+    }
+
+    function setButtonsEnabled(enabled) {
+      btnSame.disabled = !enabled;
+      btnDifferent.disabled = !enabled;
+      lockInput = !enabled;
+    }
+
+    function clearFeedback() {
+      feedbackEl.textContent = "";
+      feedbackEl.className = "";
+    }
+
+    // ---- RT summary helpers ----
+    function getAverageRT() {
+      if (!sessionRTs.length) return null;
+      const sum = sessionRTs.reduce((a, b) => a + b, 0);
+      return Math.round(sum / sessionRTs.length);
+    }
+
+    function updateHomeStatsText() {
+      const avg = getAverageRT();
+      if (avg == null) {
+        sessionStatsEl.textContent = "";
+      } else {
+        sessionStatsEl.textContent = `Last session average: ${avg} ms`;
+      }
+    }
+
+    // ---------- Timer ----------
+    function updateTimeDisplay(ms) {
+      if (typeof ms === "undefined") {
+        ms = roundEndAt - Date.now();
+      }
+      if (ms < 0) ms = 0;
+      timeLeftEl.textContent = (ms / 1000).toFixed(1) + "s";
+    }
+
+    function startTimer() {
+      roundEndAt = Date.now() + configRoundTimeMs;
+      updateTimeDisplay(configRoundTimeMs);
+      if (roundTimerId) clearInterval(roundTimerId);
+      roundTimerId = setInterval(tickTimer, 100);
+    }
+
+    function tickTimer() {
+      const remaining = roundEndAt - Date.now();
+      if (remaining <= 0) {
+        clearInterval(roundTimerId);
+        roundTimerId = null;
+        updateTimeDisplay(0);
+        handleTimeUp();
+      } else {
+        updateTimeDisplay(remaining);
+      }
+    }
+
+    function handleTimeUp() {
+      if (lockInput || !currentPair) return;
+      setButtonsEnabled(false);
+      totalTrials += 1;
+      feedbackEl.textContent = "Time's up!";
+      feedbackEl.className = "incorrect";
+      updateScoreboard();
+      // No RT recorded for timeouts
+      finishTrial();
+    }
+
+    // ---------- Round control ----------
+    function showRuleOverlay(nextRoundNumber) {
+      pickRule();
+      ruleOverlayRound.textContent = `Round ${nextRoundNumber} of ${configRounds}`;
+      ruleOverlay.style.display = "flex";
+    }
+
+    function hideRuleOverlay() {
+      ruleOverlay.style.display = "none";
+    }
+
+    function newRound() {
+      clearFeedback();
+
+      if (currentRound >= configRounds) {
+        endGame();
+        return;
+      }
+
+      if (roundTimerId) {
+        clearInterval(roundTimerId);
+        roundTimerId = null;
+      }
+      if (preRoundTimeoutId) {
+        clearTimeout(preRoundTimeoutId);
+        preRoundTimeoutId = null;
+      }
+
+      currentPair = null;
+      setButtonsEnabled(false);
+
+      leftCardEl.textContent = "…";
+      rightCardEl.textContent = "…";
+      timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
+
+      const nextRoundNumber = currentRound + 1;
+      showRuleOverlay(nextRoundNumber);
+
+      preRoundTimeoutId = setTimeout(startRoundAfterPreview, RULE_PREVIEW_MS);
+    }
+
+    function startRoundAfterPreview() {
+      preRoundTimeoutId = null;
+      hideRuleOverlay();
+
+      const pair = pickRandomPair();
+      if (!pair) {
+        leftCardEl.textContent = "?";
+        rightCardEl.textContent = "?";
+        feedbackEl.textContent = "No valid numbers in this range.";
+        feedbackEl.className = "incorrect";
+        setButtonsEnabled(false);
+        return;
+      }
+
+      currentPair = pair;
+      currentRound += 1;
+      trialStartTime = Date.now(); // start RT clock when numbers appear
+      renderPair();
+      updateScoreboard();
+      setButtonsEnabled(true);
+      startTimer();
+    }
+
+    function finishTrial() {
+      if (currentRound >= configRounds) {
+        endGame();
+      } else {
+        setTimeout(newRound, 700);
+      }
+    }
+
+    function endGame() {
+      if (roundTimerId) {
+        clearInterval(roundTimerId);
+        roundTimerId = null;
+      }
+      if (preRoundTimeoutId) {
+        clearTimeout(preRoundTimeoutId);
+        preRoundTimeoutId = null;
+      }
+      hideRuleOverlay();
+      setButtonsEnabled(false);
+      timeLeftEl.textContent = "–";
+      roundEl.textContent = `Round ${currentRound} / ${configRounds} (done)`;
+
+      const base = feedbackEl.textContent.trim();
+      const avg = getAverageRT();
+
+      // Keep the per-trial color but add session complete + avg inline, unbolded
+      let html = "";
+      if (base) {
+        html = base + "  Session complete.";
+      } else {
+        html = "Session complete.";
+      }
+      if (avg != null) {
+        html += `<span class="neutral-stats"> Last session average: ${avg} ms</span>`;
+      }
+      feedbackEl.innerHTML = html;
+
+      updateHomeStatsText(); // prepare text for home screen
+    }
+
+    // ---------- Answer handling ----------
+    function handleAnswer(userThinksSame) {
+      if (lockInput || !currentPair) return;
+      setButtonsEnabled(false);
+
+      if (roundTimerId) {
+        clearInterval(roundTimerId);
+        roundTimerId = null;
+      }
+
+      const [left, right] = currentPair;
+      const actualSame =
+        currentRule === "value"
+          ? left.value === right.value
+          : left.system === right.system;
+
+      totalTrials += 1;
+
+      // Record RT for this trial (if timer started)
+      if (trialStartTime != null) {
+        const rt = Date.now() - trialStartTime;
+        if (!isNaN(rt) && rt >= 0) {
+          sessionRTs.push(rt);
+        }
+        trialStartTime = null;
+      }
+
+      const correct = userThinksSame === actualSame;
+
+      if (correct) {
+        score += 1;
+        feedbackEl.textContent = "Correct!";
+        feedbackEl.className = "correct";
+      } else {
+        let reason;
+        if (currentRule === "value") {
+          reason = left.value === right.value
+            ? "They are the same value."
+            : "They are not the same value.";
+        } else {
+          reason = left.system === right.system
+            ? "They are the same category."
+            : "They are not the same category.";
+        }
+        feedbackEl.textContent = "Incorrect – " + reason;
+        feedbackEl.className = "incorrect";
+      }
+
+      updateScoreboard();
+      finishTrial();
+    }
+
+    // ---------- Setup / session control ----------
+    function readConfigFromInputs() {
+      let t = parseInt(roundTimeInput.value, 10);
+      if (isNaN(t) || t < 100) t = 1300;
+      if (t > 600000) t = 600000;
+      configRoundTimeMs = t;
+      roundTimeInput.value = t;
+
+      let r = parseInt(roundsInput.value, 10);
+      if (isNaN(r) || r < 1) r = 20;
+      if (r > 9999) r = 9999;
+      configRounds = r;
+      roundsInput.value = r;
+
+      let min = parseInt(minValueInput.value, 10);
+      let max = parseInt(maxValueInput.value, 10);
+      if (isNaN(min)) min = 1;
+      if (isNaN(max)) max = 20;
+      if (min < 1) min = 1;
+      if (max > GLOBAL_MAX_VALUE) max = GLOBAL_MAX_VALUE;
+      if (min > max) [min, max] = [max, min];
+      configMinValue = min;
+      configMaxValue = max;
+      minValueInput.value = min;
+      maxValueInput.value = max;
+
+      buildRepresentations(configMinValue, configMaxValue);
+    }
+
+    function startSession() {
+      readConfigFromInputs();
+
+      score = 0;
+      totalTrials = 0;
+      currentRound = 0;
+      currentPair = null;
+      trialStartTime = null;
+      sessionRTs = [];  // reset RTs for new session
+      clearFeedback();
+
+      updateScoreboard();
+      timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
+      leftCardEl.textContent = "";
+      rightCardEl.textContent = "";
+
+      setupScreen.style.display = "none";
+      gameScreen.style.display = "block";
+
+      newRound();
+    }
+
+    function returnToSetup() {
+      if (roundTimerId) {
+        clearInterval(roundTimerId);
+        roundTimerId = null;
+      }
+      if (preRoundTimeoutId) {
+        clearTimeout(preRoundTimeoutId);
+        preRoundTimeoutId = null;
+      }
+      hideRuleOverlay();
+      setButtonsEnabled(false);
+
+      // When going back home, show avg RT for the current (most recent) session
+      updateHomeStatsText();
+
+      setupScreen.style.display = "block";
+      gameScreen.style.display = "none";
+    }
+
+    // ---------- Events ----------
+    btnStart.addEventListener("click", startSession);
+    btnSame.addEventListener("click", () => handleAnswer(true));
+    btnDifferent.addEventListener("click", () => handleAnswer(false));
+    btnHome.addEventListener("click", returnToSetup);
+  </script>
+</body>
+</html>

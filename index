@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Match Game</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .game-container {
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+        h1 { margin-bottom: 20px; font-size: 1.8rem; }
+        
+        .rule-box {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .rule-label { font-size: 0.9rem; opacity: 0.7; }
+        .rule-text { font-size: 1.4rem; font-weight: bold; color: #e94560; margin-top: 5px; }
+        
+        .numbers-display {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .number-card {
+            background: #0f3460;
+            padding: 30px 50px;
+            border-radius: 16px;
+            font-size: 3rem;
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .buttons { display: flex; gap: 20px; justify-content: center; }
+        .btn {
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s, opacity 0.1s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn:active { transform: scale(0.95); }
+        .btn-yes { background: #4ecca3; color: #1a1a2e; }
+        .btn-no { background: #e94560; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .score-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .score-item span { font-weight: bold; color: #4ecca3; }
+        
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            height: 40px;
+        }
+        .correct { color: #4ecca3; }
+        .wrong { color: #e94560; }
+        
+        .start-screen, .end-screen {
+            text-align: center;
+        }
+        .btn-start {
+            background: #4ecca3;
+            color: #1a1a2e;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            margin-top: 30px;
+        }
+        .final-score { font-size: 3rem; color: #4ecca3; margin: 20px 0; }
+        .hidden { display: none; }
+
+        /* Settings Styles */
+        .settings {
+            background: #0f3460;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        .settings h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4ecca3;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .setting-row:last-child { margin-bottom: 0; }
+        .setting-row label {
+            font-size: 0.95rem;
+        }
+        .setting-row input {
+            width: 80px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #1a1a2e;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .setting-row input:focus {
+            outline: 2px solid #4ecca3;
+        }
+        .range-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-inputs span {
+            opacity: 0.7;
+        }
+        .range-inputs input {
+            width: 60px;
+        }
+        .instructions {
+            margin: 20px 0;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <h1>🔢 Number Match Game</h1>
+            
+            <p class="instructions">
+                Match numbers by <strong>VALUE</strong> or <strong>CATEGORY</strong><br>
+                • Arabic: 1, 2, 3... &nbsp; • Roman: I, II, III...
+            </p>
+
+            <div class="settings">
+                <h2>⚙️ Settings</h2>
+                <div class="setting-row">
+                    <label>Time per round (seconds)</label>
+                    <input type="number" id="setting-time" value="10" min="3" max="60">
+                </div>
+                <div class="setting-row">
+                    <label>Number of rounds</label>
+                    <input type="number" id="setting-rounds" value="10" min="1" max="50">
+                </div>
+                <div class="setting-row">
+                    <label>Number range</label>
+                    <div class="range-inputs">
+                        <input type="number" id="setting-min" value="1" min="1" max="3999">
+                        <span>to</span>
+                        <input type="number" id="setting-max" value="10" min="1" max="3999">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-start" onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="score-bar">
+                <div class="score-item">Score: <span id="score">0</span></div>
+                <div class="score-item">Round: <span id="round">1</span>/<span id="total-rounds">10</span></div>
+                <div class="score-item">Time: <span id="timer">10</span>s</div>
+            </div>
+            
+            <div class="rule-box">
+                <div class="rule-label">MATCH BY</div>
+                <div class="rule-text" id="rule">VALUE</div>
+            </div>
+            
+            <div class="numbers-display">
+                <div class="number-card" id="num1">5</div>
+                <div class="number-card" id="num2">V</div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-yes" id="btn-yes" onclick="answer(true)">YES ✓</button>
+                <button class="btn btn-no" id="btn-no" onclick="answer(false)">NO ✗</button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="end-screen hidden">
+            <h1>Game Over!</h1>
+            <div class="final-score" id="final-score">0</div>
+            <p>points</p>
+            <p style="margin-top: 15px; opacity: 0.7;" id="stats"></p>
+            <button class="btn btn-start" onclick="startGame()">Play Again</button>
+            <br>
+            <button class="btn" style="background: #0f3460; margin-top: 15px;" onclick="showScreen('start-screen')">Change Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // Roman numeral converter (supports 1-3999)
+        function toRoman(num) {
+            const romanNumerals = [
+                { value: 1000, numeral: 'M' },
+                { value: 900, numeral: 'CM' },
+                { value: 500, numeral: 'D' },
+                { value: 400, numeral: 'CD' },
+                { value: 100, numeral: 'C' },
+                { value: 90, numeral: 'XC' },
+                { value: 50, numeral: 'L' },
+                { value: 40, numeral: 'XL' },
+                { value: 10, numeral: 'X' },
+                { value: 9, numeral: 'IX' },
+                { value: 5, numeral: 'V' },
+                { value: 4, numeral: 'IV' },
+                { value: 1, numeral: 'I' }
+            ];
+            let result = '';
+            for (const pair of romanNumerals) {
+                while (num >= pair.value) {
+                    result += pair.numeral;
+                    num -= pair.value;
+                }
+            }
+            return result;
+        }
+
+        // Game settings (defaults)
+        let settings = {
+            roundTime: 10,
+            totalRounds: 10,
+            minNum: 1,
+            maxNum: 10
+        };
+
+        let score = 0;
+        let round = 0;
+        let correctCount = 0;
+        let timer = null;
+        let timeLeft = 10;
+        let currentAnswer = false;
+
+        function loadSettings() {
+            settings.roundTime = Math.max(3, Math.min(60, parseInt(document.getElementById('setting-time').value) || 10));
+            settings.totalRounds = Math.max(1, Math.min(50, parseInt(document.getElementById('setting-rounds').value) || 10));
+            settings.minNum = Math.max(1, Math.min(3999, parseInt(document.getElementById('setting-min').value) || 1));
+            settings.maxNum = Math.max(1, Math.min(3999, parseInt(document.getElementById('setting-max').value) || 10));
+            
+            // Ensure min <= max
+            if (settings.minNum > settings.maxNum) {
+                [settings.minNum, settings.maxNum] = [settings.maxNum, settings.minNum];
+            }
+        }
+
+        function startGame() {
+            loadSettings();
+            score = 0;
+            round = 0;
+            correctCount = 0;
+            document.getElementById('total-rounds').textContent = settings.totalRounds;
+            showScreen('game-screen');
+            nextRound();
+        }
+
+        function getRandomNumber() {
+            return Math.floor(Math.random() * (settings.maxNum - settings.minNum + 1)) + settings.minNum;
+        }
+
+        function nextRound() {
+            round++;
+            if (round > settings.totalRounds) {
+                endGame();
+                return;
+            }
+
+            // Update display
+            document.getElementById('score').textContent = score;
+            document.getElementById('round').textContent = round;
+            document.getElementById('feedback').textContent = '';
+            enableButtons(true);
+
+            // Pick random rule
+            const isValueRule = Math.random() > 0.5;
+            document.getElementById('rule').textContent = isValueRule ? 'VALUE' : 'CATEGORY';
+
+            // Generate numbers
+            const val1 = getRandomNumber();
+            const val2 = getRandomNumber();
+            const type1 = Math.random() > 0.5 ? 'arabic' : 'roman';
+            const type2 = Math.random() > 0.5 ? 'arabic' : 'roman';
+
+            document.getElementById('num1').textContent = type1 === 'arabic' ? val1 : toRoman(val1);
+            document.getElementById('num2').textContent = type2 === 'arabic' ? val2 : toRoman(val2);
+
+            // Determine correct answer
+            if (isValueRule) {
+                currentAnswer = (val1 === val2);
+            } else {
+                currentAnswer = (type1 === type2);
+            }
+
+            // Start timer
+            timeLeft = settings.roundTime;
+            document.getElementById('timer').textContent = timeLeft;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    enableButtons(false);
+                    showFeedback(false);
+                    setTimeout(nextRound, 1000);
+                }
+            }, 1000);
+        }
+
+        function answer(playerAnswer) {
+            clearInterval(timer);
+            enableButtons(false);
+            
+            const correct = (playerAnswer === currentAnswer);
+            if (correct) {
+                score += 10 + timeLeft; // Bonus for speed
+                correctCount++;
+            }
+            
+            showFeedback(correct);
+            setTimeout(nextRound, 1000);
+        }
+
+        function showFeedback(correct) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = correct ? '✓ Correct!' : '✗ Wrong!';
+            fb.className = 'feedback ' + (correct ? 'correct' : 'wrong');
+        }
+
+        function enableButtons(enabled) {
+            document.getElementById('btn-yes').disabled = !enabled;
+            document.getElementById('btn-no').disabled = !enabled;
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('stats').textContent = `${correctCount} / ${settings.totalRounds} correct (${Math.round(correctCount/settings.totalRounds*100)}%)`;
+            showScreen('end-screen');
+        }
+
+        function showScreen(screenId) {
+            ['start-screen', 'game-screen', 'end-screen'].forEach(id => {
+                document.getElementById(id).classList.toggle('hidden', id !== screenId);
+            });
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('game-screen').classList.contains('hidden')) return;
+            if (document.getElementById('btn-yes').disabled) return;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'y' || e.key === 'Y') {
+                answer(true);
+            } else if (e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N') {
+                answer(false);
+            }
+        });
+    </script>
+</body>
+</html>

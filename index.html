@@ -239,42 +239,6 @@
       min-height: 80px;
     }
 
-    #buttons {
-      display: flex;
-      gap: 10px;
-      margin: 6px 0 8px;
-    }
-
-    #buttons button {
-      flex: 1;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: var(--button-bg);
-      color: var(--text-main);
-    }
-
-    #btn-same {
-      background: linear-gradient(135deg, var(--accent), #22c55e);
-      color: #0b1120;
-      border-color: transparent;
-    }
-
-    #buttons button:active {
-      transform: translateY(1px);
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: default;
-      transform: none;
-    }
-
     #status-row {
       margin-top: 4px;
       display: flex;
@@ -317,10 +281,46 @@
       color: var(--wrong);
     }
 
-    /* neutral stats inside feedback (average line) */
     #feedback .neutral-stats {
       color: var(--text-main);
       font-weight: 400;        /* NOT bold */
+    }
+
+    /* Same/Different buttons – now lower on the screen */
+    #buttons {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0 8px;
+    }
+
+    #buttons button {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--button-bg);
+      color: var(--text-main);
+    }
+
+    #btn-same {
+      background: linear-gradient(135deg, var(--accent), #22c55e);
+      color: #0b1120;
+      border-color: transparent;
+    }
+
+    #buttons button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
     }
 
     /* Back to home button (always at bottom during game) */
@@ -466,11 +466,6 @@
         </div>
       </div>
 
-      <div id="buttons">
-        <button id="btn-same" type="button">Same</button>
-        <button id="btn-different" type="button">Different</button>
-      </div>
-
       <div id="status-row">
         <div id="score">
           <span>Score: <strong id="score-value">0</strong></span>
@@ -481,6 +476,12 @@
       </div>
 
       <div id="feedback"></div>
+
+      <!-- Same/Different moved lower, under feedback -->
+      <div id="buttons">
+        <button id="btn-same" type="button">Same</button>
+        <button id="btn-different" type="button">Different</button>
+      </div>
 
       <!-- Back to Home is always at the bottom on every round -->
       <button id="btn-home" type="button">Back to Home</button>
@@ -646,6 +647,9 @@
     let roundEndAt = 0;
     let preRoundTimeoutId = null;
 
+    // settings persistence
+    const SETTINGS_KEY = "nm-settings-v1";
+
     // ---------- DOM refs ----------
     const body = document.body;
     const setupScreen = document.getElementById("setup-screen");
@@ -703,6 +707,47 @@
       const isDark = body.classList.contains("dark-mode");
       applyTheme(isDark ? "light" : "dark");
     });
+
+    // ---------- Settings persistence ----------
+    function loadSettingsFromStorage() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (!raw) return;
+        const s = JSON.parse(raw);
+        if (!s || typeof s !== "object") return;
+        if (typeof s.roundTimeMs === "number") {
+          roundTimeInput.value = s.roundTimeMs;
+        }
+        if (typeof s.rounds === "number") {
+          roundsInput.value = s.rounds;
+        }
+        if (typeof s.min === "number") {
+          minValueInput.value = s.min;
+        }
+        if (typeof s.max === "number") {
+          maxValueInput.value = s.max;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function saveSettingsToStorage() {
+      const payload = {
+        roundTimeMs: configRoundTimeMs,
+        rounds: configRounds,
+        min: configMinValue,
+        max: configMaxValue
+      };
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // apply persisted settings to inputs (if any) before first start
+    loadSettingsFromStorage();
 
     // ---------- Helpers ----------
     function randomInt(max) {
@@ -895,7 +940,6 @@
       const base = feedbackEl.textContent.trim();
       const avg = getAverageRT();
 
-      // Keep the per-trial color but add session complete + avg inline, unbolded
       let html = "";
       if (base) {
         html = base + "  Session complete.";
@@ -989,6 +1033,9 @@
       maxValueInput.value = max;
 
       buildRepresentations(configMinValue, configMaxValue);
+
+      // persist settings after clamping
+      saveSettingsToStorage();
     }
 
     function startSession() {

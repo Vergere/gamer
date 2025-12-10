@@ -263,6 +263,11 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* Hide the time display entirely */
+    #time {
+      display: none;
+    }
+
     #feedback {
       margin-top: 6px;
       min-height: 1.2em;
@@ -737,6 +742,8 @@
     function setButtonsEnabled(enabled) {
       btnSame.disabled = !enabled;
       btnDifferent.disabled = !enabled;
+      btnSame.style.pointerEvents = enabled ? "auto" : "none";
+      btnDifferent.style.pointerEvents = enabled ? "auto" : "none";
       lockInput = !enabled;
     }
 
@@ -787,14 +794,14 @@
       }
     }
 
-    // IMPORTANT CHANGE: timeout now only shows "Time's up!" with neutral styling,
-    // and does NOT reveal whether the numbers matched the rule.
+    // TIMEOUT: lock input, no visible message
     function handleTimeUp() {
       if (lockInput || !currentPair) return;
-      setButtonsEnabled(false);
+      lockInput = true;
+      btnSame.style.pointerEvents = "none";
+      btnDifferent.style.pointerEvents = "none";
       totalTrials += 1;
-      feedbackEl.textContent = "Time's up!";
-      feedbackEl.className = ""; // neutral, no color
+      // No text shown at timeout
       updateScoreboard();
       finishTrial();
     }

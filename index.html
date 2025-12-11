@@ -201,22 +201,35 @@
       display: none;
     }
 
-    /* RULE BOX – in same area as cards, centered, no dimming */
+    /* Card area (fixed height) */
+    #card-area {
+      margin: 14px 0 8px;
+      position: relative;
+      height: 120px;      /* fixed area to prevent any vertical shifting */
+    }
+
+    /* RULE BOX – card occupying the card area */
     #rule-overlay {
-      margin: 14px 0 8px;      /* same vertical position as cards */
-      display: none;           /* JS toggles flex/none */
+      position: absolute;
+      inset: 0;
+      display: none;      /* JS toggles flex/none */
       justify-content: center;
       align-items: center;
     }
 
     #rule-overlay-box {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 999px;
+      width: 100%;
+      padding: 22px 14px 18px;
+      border-radius: 12px;
       border: 1px solid var(--overlay-border);
-      background: var(--overlay-panel-bg);
+      background: var(--card-bg);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      min-height: 110px;
     }
 
     #rule-overlay-label {
@@ -224,45 +237,37 @@
       letter-spacing: 0.16em;
       font-size: 0.7rem;
       color: var(--text-muted);
-      margin-right: 6px;
+      margin-bottom: 4px;
     }
 
     #rule-overlay-text {
-      font-size: 1.05rem;
+      font-size: 1.4rem;
       font-weight: 600;
       color: var(--accent);
     }
 
     #rule-overlay-round {
-      display: block;
-      margin-top: 4px;
+      margin-top: 6px;
       font-size: 0.8rem;
       color: var(--text-muted);
     }
 
-    #cards {
-      margin: 14px 0 8px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .card-wrapper {
-      position: relative;
-    }
-
-    .card {
+    /* Single stimulus card */
+    #stim-card {
+      position: absolute;
+      inset: 0;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 22px 10px 18px;
+      padding: 22px 14px 18px;
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.2rem;
+      font-size: 2.0rem;
       font-weight: 600;
       text-align: center;
-      min-height: 80px;
+      min-height: 110px;
+      width: 100%;
     }
 
     #status-row {
@@ -301,7 +306,7 @@
       min-height: 1.2em;
       font-size: 0.9rem;
       font-weight: 600;
-      text-align: center; /* CENTER feedback including Correct/Incorrect */
+      text-align: center;
     }
 
     #feedback.correct {
@@ -375,9 +380,12 @@
       #game {
         padding: 16px 16px 18px;
       }
-      .card {
-        min-height: 90px;
+      #stim-card {
+        min-height: 110px;
         font-size: 2.4rem;
+      }
+      #rule-overlay-box {
+        min-height: 110px;
       }
     }
   </style>
@@ -432,22 +440,18 @@
 
     <!-- GAME SCREEN -->
     <div id="game-screen">
-      <!-- Rule box replacing the cards area during preview -->
-      <div id="rule-overlay">
-        <div id="rule-overlay-box">
-          <span id="rule-overlay-label">Rule</span>
-          <span id="rule-overlay-text">Loading…</span>
-          <span id="rule-overlay-round"></span>
+      <div id="card-area">
+        <!-- Rule card in the card area during preview -->
+        <div id="rule-overlay">
+          <div id="rule-overlay-box">
+            <span id="rule-overlay-label">Rule</span>
+            <span id="rule-overlay-text">Loading…</span>
+            <span id="rule-overlay-round"></span>
+          </div>
         </div>
-      </div>
 
-      <div id="cards">
-        <div class="card-wrapper">
-          <div id="left-card" class="card"></div>
-        </div>
-        <div class="card-wrapper">
-          <div id="right-card" class="card"></div>
-        </div>
+        <!-- Stimulus card (shown during trial) -->
+        <div id="stim-card" class="card"></div>
       </div>
 
       <div id="status-row">
@@ -614,8 +618,8 @@
     const maxValueInput = document.getElementById("input-max");
     const btnStart = document.getElementById("btn-start");
 
-    const leftCardEl = document.getElementById("left-card");
-    const rightCardEl = document.getElementById("right-card");
+    const stimCardEl = document.getElementById("stim-card");
+
     const btnSame = document.getElementById("btn-same");
     const btnDifferent = document.getElementById("btn-different");
     const btnHome = document.getElementById("btn-home");
@@ -629,7 +633,6 @@
     const ruleOverlay = document.getElementById("rule-overlay");
     const ruleOverlayText = document.getElementById("rule-overlay-text");
     const ruleOverlayRound = document.getElementById("rule-overlay-round");
-    const cardsEl = document.getElementById("cards");
 
     const sessionStatsEl = document.getElementById("session-stats");
     const themeToggleBtn = document.getElementById("theme-toggle");
@@ -712,9 +715,10 @@
         currentRule === "value" ? "Same VALUE?" : "Same CATEGORY?";
     }
 
+    // Always use " - " as separator
     function renderPair() {
-      leftCardEl.textContent = currentPair[0].text;
-      rightCardEl.textContent = currentPair[1].text;
+      const [left, right] = currentPair;
+      stimCardEl.textContent = `${left.text} - ${right.text}`;
     }
 
     function updateScoreboard() {
@@ -794,12 +798,12 @@
       pickRule();
       ruleOverlayRound.textContent = `Round ${nextRoundNumber} of ${configRounds}`;
       ruleOverlay.style.display = "flex";
-      cardsEl.style.display = "none";  // hide cards while showing rule
+      stimCardEl.style.display = "none";
     }
 
     function hideRuleOverlay() {
       ruleOverlay.style.display = "none";
-      cardsEl.style.display = "grid";  // show cards again
+      stimCardEl.style.display = "flex";
     }
 
     function newRound() {
@@ -821,8 +825,7 @@
       currentPair = null;
       setButtonsEnabled(false);
 
-      leftCardEl.textContent = "…";
-      rightCardEl.textContent = "…";
+      stimCardEl.textContent = "…";
       timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
 
       const nextRoundNumber = currentRound + 1;
@@ -837,8 +840,7 @@
 
       const pair = pickRandomPair();
       if (!pair) {
-        leftCardEl.textContent = "?";
-        rightCardEl.textContent = "?";
+        stimCardEl.textContent = "?";
         feedbackEl.textContent = "No valid numbers in this range.";
         feedbackEl.className = "incorrect";
         setButtonsEnabled(false);
@@ -982,8 +984,7 @@
 
       updateScoreboard();
       timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
-      leftCardEl.textContent = "";
-      rightCardEl.textContent = "";
+      stimCardEl.textContent = "";
 
       setupScreen.style.display = "none";
       gameScreen.style.display = "block";

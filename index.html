@@ -527,45 +527,6 @@
       return rest ? `${base} ${toEnglish(rest)}` : base;
     }
 
-    const ES_UNDER_16 = [
-      "cero","uno","dos","tres","cuatro","cinco","seis","siete",
-      "ocho","nueve","diez","once","doce","trece","catorce","quince"
-    ];
-    const ES_TENS = [
-      "", "", "veinte","treinta","cuarenta","cincuenta",
-      "sesenta","setenta","ochenta","noventa"
-    ];
-    const ES_HUNDREDS = [
-      "", "ciento","doscientos","trescientos","cuatrocientos",
-      "quinientos","seiscientos","setecientos","ochocientos","novecientos"
-    ];
-
-    function toSpanish(n) {
-      if (n <= 0 || n > 9999) return null;
-      if (n <= 15) return ES_UNDER_16[n];
-      if (n < 20) return "dieci" + ES_UNDER_16[n - 10];
-      if (n === 20) return "veinte";
-      if (n < 30) return "veinti" + ES_UNDER_16[n - 20];
-      if (n < 100) {
-        const tens = Math.floor(n / 10);
-        const rest = n % 10;
-        const base = ES_TENS[tens];
-        return rest ? `${base} y ${ES_UNDER_16[rest]}` : base;
-      }
-      if (n === 100) return "cien";
-      if (n < 1000) {
-        const hundreds = Math.floor(n / 100);
-        const rest = n % 100;
-        const base = ES_HUNDREDS[hundreds];
-        return rest ? `${base} ${toSpanish(rest)}` : base;
-      }
-      if (n === 1000) return "mil";
-      const thousands = Math.floor(n / 1000);
-      const rest = n % 1000;
-      const base = thousands === 1 ? "mil" : `${toSpanish(thousands)} mil`;
-      return rest ? `${base} ${toSpanish(rest)}` : base;
-    }
-
     function buildRepresentations(minValue, maxValue) {
       representations = [];
       for (let value = minValue; value <= maxValue; value++) {
@@ -576,9 +537,6 @@
 
         const english = toEnglish(value);
         if (english) representations.push({ value, text: english, system: "English" });
-
-        const spanish = toSpanish(value);
-        if (spanish) representations.push({ value, text: spanish, system: "Spanish" });
       }
     }
 

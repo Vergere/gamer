@@ -5,12 +5,7 @@
   <title>Number Match Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* THEME VARIABLES
-       Light is default; dark overrides via body.dark-mode.
-    */
-
     :root {
-      /* Light theme defaults */
       --bg: #f3f4f6;
       --panel: #ffffff;
       --border: #e5e7eb;
@@ -21,8 +16,6 @@
       --right: #16a34a;
       --wrong: #dc2626;
       --card-bg: #ffffff;
-      --overlay-bg: transparent;
-      --overlay-panel-bg: #ffffff;
       --overlay-border: #e5e7eb;
       --button-bg: #f9fafb;
       --button-border: #d1d5db;
@@ -39,21 +32,17 @@
       --right: #4ade80;
       --wrong: #f97373;
       --card-bg: #1e293b;
-      --overlay-bg: transparent;
-      --overlay-panel-bg: #020617;
       --overlay-border: #1f2937;
       --button-bg: #0b1120;
       --button-border: #1f2937;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1f2937 0, var(--bg) 55%, #020617 100%);
+      background: var(--bg);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -61,7 +50,6 @@
       justify-content: center;
       padding: 12px;
       transition: background-color 0.15s ease-out, color 0.15s ease-out;
-      background: var(--bg);
     }
 
     #game {
@@ -75,8 +63,6 @@
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
       padding: 14px 12px 16px;
     }
-
-    /* Top bar: title + theme toggle */
 
     #top-bar {
       display: flex;
@@ -116,15 +102,10 @@
       white-space: nowrap;
     }
 
-    #theme-toggle:active {
-      transform: translateY(1px);
-    }
+    #theme-toggle:active { transform: translateY(1px); }
 
-    /* PRE‑TRIAL SETUP (HOME) */
-
-    #setup-screen {
-      margin-top: 8px;
-    }
+    /* SETUP */
+    #setup-screen { margin-top: 8px; }
 
     #settings {
       display: flex;
@@ -183,36 +164,30 @@
       cursor: pointer;
     }
 
-    #btn-start:active {
-      transform: translateY(1px);
-    }
+    #btn-start:active { transform: translateY(1px); }
 
-    /* Last-session stats on home screen */
     #session-stats {
       margin-top: 8px;
       font-size: 0.85rem;
       color: var(--text-muted);
     }
 
-    /* GAME SCREEN */
-
+    /* GAME */
     #game-screen {
       margin-top: 8px;
       display: none;
     }
 
-    /* Card area (fixed height) */
     #card-area {
       margin: 14px 0 8px;
       position: relative;
-      height: 120px;      /* fixed area to prevent any vertical shifting */
+      height: 120px;
     }
 
-    /* RULE BOX – card occupying the card area */
     #rule-overlay {
       position: absolute;
       inset: 0;
-      display: none;      /* JS toggles flex/none */
+      display: none;
       justify-content: center;
       align-items: center;
     }
@@ -252,7 +227,6 @@
       color: var(--text-muted);
     }
 
-    /* Single stimulus card */
     #stim-card {
       position: absolute;
       inset: 0;
@@ -263,7 +237,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.0rem;
+      font-size: 2rem;
       font-weight: 600;
       text-align: center;
       min-height: 110px;
@@ -287,19 +261,12 @@
       align-items: center;
     }
 
-    #score strong {
-      color: var(--accent);
-    }
+    #score strong { color: var(--accent); }
 
-    #accuracy,
-    #round {
-      font-variant-numeric: tabular-nums;
-    }
+    #accuracy, #round { font-variant-numeric: tabular-nums; }
 
-    /* Hide time display (logic still runs) */
-    #time {
-      display: none;
-    }
+    /* Hidden time display (logic still runs) */
+    #time { display: none; }
 
     #feedback {
       margin-top: 6px;
@@ -309,20 +276,14 @@
       text-align: center;
     }
 
-    #feedback.correct {
-      color: var(--right);
-    }
-
-    #feedback.incorrect {
-      color: var(--wrong);
-    }
+    #feedback.correct { color: var(--right); }
+    #feedback.incorrect { color: var(--wrong); }
 
     #feedback .neutral-stats {
       color: var(--text-main);
       font-weight: 400;
     }
 
-    /* Same/Different buttons – lower + larger */
     #buttons {
       display: flex;
       gap: 10px;
@@ -349,9 +310,7 @@
       border-color: transparent;
     }
 
-    #buttons button:active {
-      transform: translateY(1px);
-    }
+    #buttons button:active { transform: translateY(1px); }
 
     button:disabled {
       opacity: 0.45;
@@ -359,7 +318,6 @@
       transform: none;
     }
 
-    /* Back to home button (further down) */
     #btn-home {
       margin-top: 32px;
       width: 100%;
@@ -372,24 +330,16 @@
       cursor: pointer;
     }
 
-    #btn-home:active {
-      transform: translateY(1px);
-    }
+    #btn-home:active { transform: translateY(1px); }
 
     @media (min-width: 640px) {
-      #game {
-        padding: 16px 16px 18px;
-      }
-      #stim-card {
-        min-height: 110px;
-        font-size: 2.4rem;
-      }
-      #rule-overlay-box {
-        min-height: 110px;
-      }
+      #game { padding: 16px 16px 18px; }
+      #stim-card { min-height: 110px; font-size: 2.4rem; }
+      #rule-overlay-box { min-height: 110px; }
     }
   </style>
 </head>
+
 <body>
   <div id="game">
     <div id="top-bar">
@@ -400,7 +350,7 @@
       <button id="theme-toggle" type="button">Dark mode</button>
     </div>
 
-    <!-- PRE‑TRIAL SETUP (HOME) -->
+    <!-- SETUP -->
     <div id="setup-screen">
       <div id="settings">
         <div class="setting-group">
@@ -438,10 +388,9 @@
       <button id="btn-start" type="button">Start</button>
     </div>
 
-    <!-- GAME SCREEN -->
+    <!-- GAME -->
     <div id="game-screen">
       <div id="card-area">
-        <!-- Rule card in the card area during preview -->
         <div id="rule-overlay">
           <div id="rule-overlay-box">
             <span id="rule-overlay-label">Rule</span>
@@ -450,7 +399,6 @@
           </div>
         </div>
 
-        <!-- Stimulus card (shown during trial) -->
         <div id="stim-card" class="card"></div>
       </div>
 
@@ -475,8 +423,25 @@
   </div>
 
   <script>
+    "use strict";
+
+    // ---- Utilities ----
+    const $ = (id) => document.getElementById(id);
+
+    function clampInt(raw, min, max, fallback) {
+      let n = parseInt(raw, 10);
+      if (Number.isNaN(n)) n = fallback;
+      if (n < min) n = min;
+      if (n > max) n = max;
+      return n;
+    }
+
+    function randomInt(maxExclusive) {
+      return Math.floor(Math.random() * maxExclusive);
+    }
+
+    // ---- Number representations ----
     const GLOBAL_MAX_VALUE = 3999;
-    let representations = [];
 
     function toRoman(n) {
       if (n <= 0 || n > GLOBAL_MAX_VALUE) return null;
@@ -511,9 +476,7 @@
       if (n < 100) {
         const tens = Math.floor(n / 10);
         const rest = n % 10;
-        return rest
-          ? `${EN_TENS[tens]}-${EN_UNDER_20[rest]}`
-          : EN_TENS[tens];
+        return rest ? `${EN_TENS[tens]}-${EN_UNDER_20[rest]}` : EN_TENS[tens];
       }
       if (n < 1000) {
         const hundreds = Math.floor(n / 100);
@@ -528,286 +491,271 @@
     }
 
     function buildRepresentations(minValue, maxValue) {
-      representations = [];
+      const reps = [];
       for (let value = minValue; value <= maxValue; value++) {
-        representations.push({ value, text: String(value), system: "Arabic" });
+        reps.push({ value, text: String(value), system: "Arabic" });
 
         const roman = toRoman(value);
-        if (roman) representations.push({ value, text: roman, system: "Roman" });
+        if (roman) reps.push({ value, text: roman, system: "Roman" });
 
         const english = toEnglish(value);
-        if (english) representations.push({ value, text: english, system: "English" });
+        if (english) reps.push({ value, text: english, system: "English" });
       }
+      return reps;
     }
 
-    // Config
-    let configRoundTimeMs = 1300;
-    let configRounds = 20;
-    let configMinValue = 1;
-    let configMaxValue = 20;
+    // ---- DOM ----
+    const ui = {
+      body: document.body,
 
-    // Game state
-    let currentPair = null;
-    let currentRule = "value";
-    let score = 0;
-    let totalTrials = 0;
-    let currentRound = 0;
-    let lockInput = true;
+      setupScreen: $("setup-screen"),
+      gameScreen: $("game-screen"),
 
-    let trialStartTime = null;
-    let sessionRTs = [];
+      roundTimeInput: $("input-round-time"),
+      roundsInput: $("input-rounds"),
+      minValueInput: $("input-min"),
+      maxValueInput: $("input-max"),
 
-    const RULE_PREVIEW_MS = 1000;
+      btnStart: $("btn-start"),
+      btnHome: $("btn-home"),
+      btnSame: $("btn-same"),
+      btnDifferent: $("btn-different"),
 
-    let roundTimerId = null;
-    let roundEndAt = 0;
-    let preRoundTimeoutId = null;
+      stimCard: $("stim-card"),
 
-    const SETTINGS_KEY = "nm-settings-v1";
+      scoreValue: $("score-value"),
+      accuracy: $("accuracy"),
+      feedback: $("feedback"),
+      round: $("round"),
+      timeLeft: $("time-left"),
 
-    // DOM refs
-    const body = document.body;
-    const setupScreen = document.getElementById("setup-screen");
-    const gameScreen = document.getElementById("game-screen");
+      ruleOverlay: $("rule-overlay"),
+      ruleOverlayText: $("rule-overlay-text"),
+      ruleOverlayRound: $("rule-overlay-round"),
 
-    const roundTimeInput = document.getElementById("input-round-time");
-    const roundsInput = document.getElementById("input-rounds");
-    const minValueInput = document.getElementById("input-min");
-    const maxValueInput = document.getElementById("input-max");
-    const btnStart = document.getElementById("btn-start");
+      sessionStats: $("session-stats"),
+      themeToggle: $("theme-toggle")
+    };
 
-    const stimCardEl = document.getElementById("stim-card");
-
-    const btnSame = document.getElementById("btn-same");
-    const btnDifferent = document.getElementById("btn-different");
-    const btnHome = document.getElementById("btn-home");
-
-    const scoreValueEl = document.getElementById("score-value");
-    const accuracyEl = document.getElementById("accuracy");
-    const feedbackEl = document.getElementById("feedback");
-    const roundEl = document.getElementById("round");
-    const timeLeftEl = document.getElementById("time-left");
-
-    const ruleOverlay = document.getElementById("rule-overlay");
-    const ruleOverlayText = document.getElementById("rule-overlay-text");
-    const ruleOverlayRound = document.getElementById("rule-overlay-round");
-
-    const sessionStatsEl = document.getElementById("session-stats");
-    const themeToggleBtn = document.getElementById("theme-toggle");
-
-    // Theme
+    // ---- Theme ----
     function applyTheme(mode) {
-      if (mode === "dark") {
-        body.classList.add("dark-mode");
-        themeToggleBtn.textContent = "Light mode";
-      } else {
-        body.classList.remove("dark-mode");
-        themeToggleBtn.textContent = "Dark mode";
-      }
-      try {
-        localStorage.setItem("nm-theme", mode);
-      } catch (e) {}
+      const isDark = mode === "dark";
+      ui.body.classList.toggle("dark-mode", isDark);
+      ui.themeToggle.textContent = isDark ? "Light mode" : "Dark mode";
+      try { localStorage.setItem("nm-theme", mode); } catch (_) {}
     }
 
     (function initTheme() {
       let saved = null;
-      try {
-        saved = localStorage.getItem("nm-theme");
-      } catch (e) {}
-      if (saved === "dark") applyTheme("dark");
-      else applyTheme("light");
+      try { saved = localStorage.getItem("nm-theme"); } catch (_) {}
+      applyTheme(saved === "dark" ? "dark" : "light");
     })();
 
-    themeToggleBtn.addEventListener("click", () => {
-      const isDark = body.classList.contains("dark-mode");
-      applyTheme(isDark ? "light" : "dark");
+    ui.themeToggle.addEventListener("click", () => {
+      applyTheme(ui.body.classList.contains("dark-mode") ? "light" : "dark");
     });
 
-    // Settings persistence
-    function loadSettingsFromStorage() {
+    // ---- Settings persistence ----
+    const SETTINGS_KEY = "nm-settings-v1";
+
+    function loadSettings() {
       try {
         const raw = localStorage.getItem(SETTINGS_KEY);
         if (!raw) return;
         const s = JSON.parse(raw);
         if (!s || typeof s !== "object") return;
-        if (typeof s.roundTimeMs === "number") roundTimeInput.value = s.roundTimeMs;
-        if (typeof s.rounds === "number") roundsInput.value = s.rounds;
-        if (typeof s.min === "number") minValueInput.value = s.min;
-        if (typeof s.max === "number") maxValueInput.value = s.max;
-      } catch (e) {}
+
+        if (typeof s.roundTimeMs === "number") ui.roundTimeInput.value = s.roundTimeMs;
+        if (typeof s.rounds === "number") ui.roundsInput.value = s.rounds;
+        if (typeof s.min === "number") ui.minValueInput.value = s.min;
+        if (typeof s.max === "number") ui.maxValueInput.value = s.max;
+      } catch (_) {}
     }
 
-    function saveSettingsToStorage() {
-      const payload = {
-        roundTimeMs: configRoundTimeMs,
-        rounds: configRounds,
-        min: configMinValue,
-        max: configMaxValue
-      };
-      try {
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
-      } catch (e) {}
+    function saveSettings(config) {
+      try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(config)); } catch (_) {}
     }
 
-    loadSettingsFromStorage();
+    loadSettings();
 
-    // Helpers
-    function randomInt(max) {
-      return Math.floor(Math.random() * max);
-    }
+    // ---- Game state ----
+    const RULE_PREVIEW_MS = 1000;
+    const NEXT_ROUND_DELAY_MS = 700;
 
-    function pickRandomPair() {
-      const pool = representations;
-      if (pool.length < 2) return null;
-      const i = randomInt(pool.length);
-      let j;
-      do {
-        j = randomInt(pool.length);
-      } while (j === i);
-      return [pool[i], pool[j]];
-    }
+    const state = {
+      configRoundTimeMs: 1300,
+      configRounds: 20,
+      configMinValue: 1,
+      configMaxValue: 20,
 
-    function pickRule() {
-      currentRule = Math.random() < 0.5 ? "value" : "category";
-      ruleOverlayText.textContent =
-        currentRule === "value" ? "Same VALUE?" : "Same CATEGORY?";
-    }
+      representations: [],
 
-    // Always use " - " as separator
-    function renderPair() {
-      const [left, right] = currentPair;
-      stimCardEl.textContent = `${left.text} - ${right.text}`;
-    }
+      currentPair: null,
+      currentRule: "value", // "value" | "category"
 
-    function updateScoreboard() {
-      scoreValueEl.textContent = score;
-      accuracyEl.textContent = `(${score} / ${totalTrials})`;
-      roundEl.textContent = `Round ${currentRound} / ${configRounds}`;
+      score: 0,
+      totalTrials: 0,
+      currentRound: 0,
+
+      lockInput: true,
+
+      trialStartTime: null,
+      sessionRTs: [],
+
+      roundTimerId: null,
+      roundEndAt: 0,
+
+      preRoundTimeoutId: null
+    };
+
+    // ---- UI helpers ----
+    function setFeedback(text, cls) {
+      ui.feedback.textContent = text || "";
+      ui.feedback.className = cls || "";
     }
 
     function setButtonsEnabled(enabled) {
-      btnSame.disabled = !enabled;
-      btnDifferent.disabled = !enabled;
-      btnSame.style.pointerEvents = enabled ? "auto" : "none";
-      btnDifferent.style.pointerEvents = enabled ? "auto" : "none";
-      lockInput = !enabled;
+      ui.btnSame.disabled = !enabled;
+      ui.btnDifferent.disabled = !enabled;
+      state.lockInput = !enabled;
     }
 
-    function clearFeedback() {
-      feedbackEl.textContent = "";
-      feedbackEl.className = "";
+    function updateScoreboard() {
+      ui.scoreValue.textContent = String(state.score);
+      ui.accuracy.textContent = `(${state.score} / ${state.totalTrials})`;
+      ui.round.textContent = `Round ${state.currentRound} / ${state.configRounds}`;
     }
 
-    // RT summary
+    function renderPair() {
+      const [left, right] = state.currentPair;
+      ui.stimCard.textContent = `${left.text} - ${right.text}`;
+    }
+
     function getAverageRT() {
-      if (!sessionRTs.length) return null;
-      const sum = sessionRTs.reduce((a, b) => a + b, 0);
-      return Math.round(sum / sessionRTs.length);
+      if (!state.sessionRTs.length) return null;
+      const sum = state.sessionRTs.reduce((a, b) => a + b, 0);
+      return Math.round(sum / state.sessionRTs.length);
     }
 
     function updateHomeStatsText() {
       const avg = getAverageRT();
-      sessionStatsEl.textContent = avg == null
-        ? ""
-        : `Last session average: ${avg} ms`;
+      ui.sessionStats.textContent = avg == null ? "" : `Last session average: ${avg} ms`;
     }
 
-    // Timer
+    // ---- Timer ----
     function updateTimeDisplay(ms) {
-      if (typeof ms === "undefined") {
-        ms = roundEndAt - Date.now();
+      const safe = Math.max(0, ms);
+      ui.timeLeft.textContent = (safe / 1000).toFixed(1) + "s";
+    }
+
+    function stopTimer() {
+      if (state.roundTimerId) {
+        clearInterval(state.roundTimerId);
+        state.roundTimerId = null;
       }
-      if (ms < 0) ms = 0;
-      timeLeftEl.textContent = (ms / 1000).toFixed(1) + "s";
     }
 
     function startTimer() {
-      roundEndAt = Date.now() + configRoundTimeMs;
-      updateTimeDisplay(configRoundTimeMs);
-      if (roundTimerId) clearInterval(roundTimerId);
-      roundTimerId = setInterval(tickTimer, 100);
+      state.roundEndAt = Date.now() + state.configRoundTimeMs;
+      updateTimeDisplay(state.configRoundTimeMs);
+
+      stopTimer();
+      state.roundTimerId = setInterval(() => {
+        const remaining = state.roundEndAt - Date.now();
+        if (remaining <= 0) {
+          stopTimer();
+          updateTimeDisplay(0);
+          handleTimeUp();
+        } else {
+          updateTimeDisplay(remaining);
+        }
+      }, 100);
     }
 
-    function tickTimer() {
-      const remaining = roundEndAt - Date.now();
-      if (remaining <= 0) {
-        clearInterval(roundTimerId);
-        roundTimerId = null;
-        updateTimeDisplay(0);
-        handleTimeUp();
-      } else {
-        updateTimeDisplay(remaining);
-      }
-    }
-
-    // TIMEOUT: lock input, no visible message
     function handleTimeUp() {
-      if (lockInput || !currentPair) return;
-      lockInput = true;
-      btnSame.style.pointerEvents = "none";
-      btnDifferent.style.pointerEvents = "none";
-      totalTrials += 1;
+      if (state.lockInput || !state.currentPair) return;
+
+      setButtonsEnabled(false);
+      state.totalTrials += 1;
       updateScoreboard();
       finishTrial();
     }
 
-    // Round control
+    // ---- Rule / round control ----
+    function pickRule() {
+      state.currentRule = Math.random() < 0.5 ? "value" : "category";
+      ui.ruleOverlayText.textContent = state.currentRule === "value" ? "Same VALUE?" : "Same CATEGORY?";
+    }
+
     function showRuleOverlay(nextRoundNumber) {
       pickRule();
-      ruleOverlayRound.textContent = `Round ${nextRoundNumber} of ${configRounds}`;
-      ruleOverlay.style.display = "flex";
-      stimCardEl.style.display = "none";
+      ui.ruleOverlayRound.textContent = `Round ${nextRoundNumber} of ${state.configRounds}`;
+      ui.ruleOverlay.style.display = "flex";
+      ui.stimCard.style.display = "none";
     }
 
     function hideRuleOverlay() {
-      ruleOverlay.style.display = "none";
-      stimCardEl.style.display = "flex";
+      ui.ruleOverlay.style.display = "none";
+      ui.stimCard.style.display = "flex";
+    }
+
+    function pickRandomPair() {
+      const pool = state.representations;
+      if (pool.length < 2) return null;
+
+      const i = randomInt(pool.length);
+      let j = randomInt(pool.length);
+      while (j === i) j = randomInt(pool.length);
+
+      return [pool[i], pool[j]];
+    }
+
+    function clearPendingRoundTimeout() {
+      if (state.preRoundTimeoutId) {
+        clearTimeout(state.preRoundTimeoutId);
+        state.preRoundTimeoutId = null;
+      }
     }
 
     function newRound() {
-      clearFeedback();
-      if (currentRound >= configRounds) {
+      setFeedback("", "");
+
+      if (state.currentRound >= state.configRounds) {
         endGame();
         return;
       }
 
-      if (roundTimerId) {
-        clearInterval(roundTimerId);
-        roundTimerId = null;
-      }
-      if (preRoundTimeoutId) {
-        clearTimeout(preRoundTimeoutId);
-        preRoundTimeoutId = null;
-      }
+      stopTimer();
+      clearPendingRoundTimeout();
 
-      currentPair = null;
+      state.currentPair = null;
       setButtonsEnabled(false);
 
-      stimCardEl.textContent = "…";
-      timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
+      ui.stimCard.textContent = "…";
+      updateTimeDisplay(state.configRoundTimeMs);
 
-      const nextRoundNumber = currentRound + 1;
+      const nextRoundNumber = state.currentRound + 1;
       showRuleOverlay(nextRoundNumber);
 
-      preRoundTimeoutId = setTimeout(startRoundAfterPreview, RULE_PREVIEW_MS);
+      state.preRoundTimeoutId = setTimeout(startRoundAfterPreview, RULE_PREVIEW_MS);
     }
 
     function startRoundAfterPreview() {
-      preRoundTimeoutId = null;
+      state.preRoundTimeoutId = null;
       hideRuleOverlay();
 
       const pair = pickRandomPair();
       if (!pair) {
-        stimCardEl.textContent = "?";
-        feedbackEl.textContent = "No valid numbers in this range.";
-        feedbackEl.className = "incorrect";
+        ui.stimCard.textContent = "?";
+        setFeedback("No valid numbers in this range.", "incorrect");
         setButtonsEnabled(false);
         return;
       }
 
-      currentPair = pair;
-      currentRound += 1;
-      trialStartTime = Date.now();
+      state.currentPair = pair;
+      state.currentRound += 1;
+      state.trialStartTime = Date.now();
+
       renderPair();
       updateScoreboard();
       setButtonsEnabled(true);
@@ -815,164 +763,134 @@
     }
 
     function finishTrial() {
-      if (currentRound >= configRounds) {
-        endGame();
-      } else {
-        setTimeout(newRound, 700);
-      }
+      if (state.currentRound >= state.configRounds) endGame();
+      else setTimeout(newRound, NEXT_ROUND_DELAY_MS);
     }
 
     function endGame() {
-      if (roundTimerId) {
-        clearInterval(roundTimerId);
-        roundTimerId = null;
-      }
-      if (preRoundTimeoutId) {
-        clearTimeout(preRoundTimeoutId);
-        preRoundTimeoutId = null;
-      }
+      stopTimer();
+      clearPendingRoundTimeout();
+
       hideRuleOverlay();
       setButtonsEnabled(false);
-      timeLeftEl.textContent = "–";
-      roundEl.textContent = `Round ${currentRound} / ${configRounds} (done)`;
 
-      const base = feedbackEl.textContent.trim();
+      ui.timeLeft.textContent = "–";
+      ui.round.textContent = `Round ${state.currentRound} / ${state.configRounds} (done)`;
+
       const avg = getAverageRT();
+      const base = ui.feedback.textContent.trim();
 
-      let html = base
-        ? base + "  Session complete."
-        : "Session complete.";
-      if (avg != null) {
-        html += `<span class="neutral-stats"> Last session average: ${avg} ms</span>`;
-      }
-      feedbackEl.innerHTML = html;
+      let html = base ? base + "  Session complete." : "Session complete.";
+      if (avg != null) html += `<span class="neutral-stats"> Last session average: ${avg} ms</span>`;
+      ui.feedback.innerHTML = html;
 
       updateHomeStatsText();
     }
 
-    // Answer handling
+    // ---- Answers ----
     function handleAnswer(userThinksSame) {
-      if (lockInput || !currentPair) return;
+      if (state.lockInput || !state.currentPair) return;
+
       setButtonsEnabled(false);
+      stopTimer();
 
-      if (roundTimerId) {
-        clearInterval(roundTimerId);
-        roundTimerId = null;
-      }
+      const [left, right] = state.currentPair;
+      const actualSame = (state.currentRule === "value")
+        ? left.value === right.value
+        : left.system === right.system;
 
-      const [left, right] = currentPair;
-      const actualSame =
-        currentRule === "value"
-          ? left.value === right.value
-          : left.system === right.system;
+      state.totalTrials += 1;
 
-      totalTrials += 1;
-
-      if (trialStartTime != null) {
-        const rt = Date.now() - trialStartTime;
-        if (!isNaN(rt) && rt >= 0) sessionRTs.push(rt);
-        trialStartTime = null;
+      if (state.trialStartTime != null) {
+        const rt = Date.now() - state.trialStartTime;
+        if (!Number.isNaN(rt) && rt >= 0) state.sessionRTs.push(rt);
+        state.trialStartTime = null;
       }
 
       const correct = userThinksSame === actualSame;
 
       if (correct) {
-        score += 1;
-        feedbackEl.textContent = "Correct!";
-        feedbackEl.className = "correct";
+        state.score += 1;
+        setFeedback("Correct!", "correct");
       } else {
-        let reason;
-        if (currentRule === "value") {
-          reason = left.value === right.value
-            ? "They are the same value."
-            : "They are not the same value.";
-        } else {
-          reason = left.system === right.system
-            ? "They are the same category."
-            : "They are not the same category.";
-        }
-        feedbackEl.textContent = "Incorrect – " + reason;
-        feedbackEl.className = "incorrect";
+        const reason = (state.currentRule === "value")
+          ? (left.value === right.value ? "They are the same value." : "They are not the same value.")
+          : (left.system === right.system ? "They are the same category." : "They are not the same category.");
+        setFeedback("Incorrect – " + reason, "incorrect");
       }
 
       updateScoreboard();
       finishTrial();
     }
 
-    // Setup / session
+    // ---- Session setup ----
     function readConfigFromInputs() {
-      let t = parseInt(roundTimeInput.value, 10);
-      if (isNaN(t) || t < 100) t = 1300;
-      if (t > 600000) t = 600000;
-      configRoundTimeMs = t;
-      roundTimeInput.value = t;
+      state.configRoundTimeMs = clampInt(ui.roundTimeInput.value, 100, 600000, 1300);
+      ui.roundTimeInput.value = state.configRoundTimeMs;
 
-      let r = parseInt(roundsInput.value, 10);
-      if (isNaN(r) || r < 1) r = 20;
-      if (r > 9999) r = 9999;
-      configRounds = r;
-      roundsInput.value = r;
+      state.configRounds = clampInt(ui.roundsInput.value, 1, 9999, 20);
+      ui.roundsInput.value = state.configRounds;
 
-      let min = parseInt(minValueInput.value, 10);
-      let max = parseInt(maxValueInput.value, 10);
-      if (isNaN(min)) min = 1;
-      if (isNaN(max)) max = 20;
-      if (min < 1) min = 1;
-      if (max > GLOBAL_MAX_VALUE) max = GLOBAL_MAX_VALUE;
+      let min = clampInt(ui.minValueInput.value, 1, GLOBAL_MAX_VALUE, 1);
+      let max = clampInt(ui.maxValueInput.value, 1, GLOBAL_MAX_VALUE, 20);
       if (min > max) [min, max] = [max, min];
-      configMinValue = min;
-      configMaxValue = max;
-      minValueInput.value = min;
-      maxValueInput.value = max;
 
-      buildRepresentations(configMinValue, configMaxValue);
-      saveSettingsToStorage();
+      state.configMinValue = min;
+      state.configMaxValue = max;
+
+      ui.minValueInput.value = min;
+      ui.maxValueInput.value = max;
+
+      state.representations = buildRepresentations(min, max);
+
+      saveSettings({
+        roundTimeMs: state.configRoundTimeMs,
+        rounds: state.configRounds,
+        min: state.configMinValue,
+        max: state.configMaxValue
+      });
     }
 
     function startSession() {
       readConfigFromInputs();
 
-      score = 0;
-      totalTrials = 0;
-      currentRound = 0;
-      currentPair = null;
-      trialStartTime = null;
-      sessionRTs = [];
-      clearFeedback();
+      state.score = 0;
+      state.totalTrials = 0;
+      state.currentRound = 0;
+      state.currentPair = null;
+      state.trialStartTime = null;
+      state.sessionRTs = [];
+      state.lockInput = true;
 
+      setFeedback("", "");
       updateScoreboard();
-      timeLeftEl.textContent = (configRoundTimeMs / 1000).toFixed(1) + "s";
-      stimCardEl.textContent = "";
+      updateTimeDisplay(state.configRoundTimeMs);
+      ui.stimCard.textContent = "";
 
-      setupScreen.style.display = "none";
-      gameScreen.style.display = "block";
+      ui.setupScreen.style.display = "none";
+      ui.gameScreen.style.display = "block";
 
       newRound();
     }
 
     function returnToSetup() {
-      if (roundTimerId) {
-        clearInterval(roundTimerId);
-        roundTimerId = null;
-      }
-      if (preRoundTimeoutId) {
-        clearTimeout(preRoundTimeoutId);
-        preRoundTimeoutId = null;
-      }
+      stopTimer();
+      clearPendingRoundTimeout();
+
       hideRuleOverlay();
       setButtonsEnabled(false);
 
       updateHomeStatsText();
 
-      setupScreen.style.display = "block";
-      gameScreen.style.display = "none";
+      ui.setupScreen.style.display = "block";
+      ui.gameScreen.style.display = "none";
     }
 
-    // Events
-    btnStart.addEventListener("click", startSession);
-    btnSame.addEventListener("click", () => handleAnswer(true));
-    btnDifferent.addEventListener("click", () => handleAnswer(false));
-    btnHome.addEventListener("click", returnToSetup);
+    // ---- Events ----
+    ui.btnStart.addEventListener("click", startSession);
+    ui.btnSame.addEventListener("click", () => handleAnswer(true));
+    ui.btnDifferent.addEventListener("click", () => handleAnswer(false));
+    ui.btnHome.addEventListener("click", returnToSetup);
   </script>
 </body>
 </html>

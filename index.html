@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Number Match Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
       --bg: #f3f4f6;
       --panel: #ffffff;
       --border: #e5e7eb;
       --accent: #2563eb;
-      --accent-soft: rgba(37, 99, 235, 0.08);
       --text-main: #111827;
       --text-muted: #6b7280;
       --right: #16a34a;
       --wrong: #dc2626;
       --card-bg: #ffffff;
-      --overlay-border: #e5e7eb;
       --button-bg: #f9fafb;
       --button-border: #d1d5db;
     }
@@ -26,13 +24,11 @@
       --panel: #020617;
       --border: #1f2937;
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
       --right: #4ade80;
       --wrong: #f97373;
       --card-bg: #1e293b;
-      --overlay-border: #1f2937;
       --button-bg: #0b1120;
       --button-border: #1f2937;
     }
@@ -46,14 +42,12 @@
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
-      align-items: stretch;
       justify-content: center;
       padding: 12px;
-      transition: background-color 0.15s ease-out, color 0.15s ease-out;
+      transition: background-color 0.15s, color 0.15s;
     }
 
     #game {
-      position: relative;
       width: 100%;
       max-width: 480px;
       margin: auto;
@@ -72,21 +66,10 @@
       margin-bottom: 6px;
     }
 
-    #top-bar-main {
-      flex: 1;
-      min-width: 0;
-    }
-
     h1 {
       margin: 0;
       font-size: 1.4rem;
       letter-spacing: 0.02em;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.86rem;
     }
 
     #theme-toggle {
@@ -99,12 +82,10 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       cursor: pointer;
-      white-space: nowrap;
     }
 
     #theme-toggle:active { transform: translateY(1px); }
 
-    /* SETUP */
     #setup-screen { margin-top: 8px; }
 
     #settings {
@@ -140,13 +121,9 @@
       padding: 6px 8px;
       border-radius: 10px;
       border: 1px solid var(--border);
-      background: #f9fafb;
+      background: var(--button-bg);
       color: var(--text-main);
       font-size: 0.9rem;
-    }
-
-    body.dark-mode #settings input[type="number"] {
-      background: rgba(15, 23, 42, 0.4);
     }
 
     #btn-start {
@@ -156,7 +133,7 @@
       border-radius: 999px;
       border: none;
       background: var(--accent);
-      color: #ffffff;
+      color: #fff;
       font-weight: 600;
       font-size: 0.95rem;
       letter-spacing: 0.03em;
@@ -172,7 +149,6 @@
       color: var(--text-muted);
     }
 
-    /* GAME */
     #game-screen {
       margin-top: 8px;
       display: none;
@@ -190,21 +166,25 @@
       display: none;
       justify-content: center;
       align-items: center;
+      z-index: 2;
     }
 
-    #rule-overlay-box {
+    .card-box {
       width: 100%;
       padding: 22px 14px 18px;
       border-radius: 12px;
-      border: 1px solid var(--overlay-border);
+      border: 1px solid var(--border);
       background: var(--card-bg);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       min-height: 110px;
+    }
+
+    #rule-overlay .card-box {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     #rule-overlay-label {
@@ -230,18 +210,9 @@
     #stim-card {
       position: absolute;
       inset: 0;
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 22px 14px 18px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 2rem;
       font-weight: 600;
-      text-align: center;
-      min-height: 110px;
-      width: 100%;
+      z-index: 1;
     }
 
     #status-row {
@@ -265,9 +236,6 @@
 
     #accuracy, #round { font-variant-numeric: tabular-nums; }
 
-    /* Hidden time display (logic still runs) */
-    #time { display: none; }
-
     #feedback {
       margin-top: 6px;
       min-height: 1.2em;
@@ -278,11 +246,7 @@
 
     #feedback.correct { color: var(--right); }
     #feedback.incorrect { color: var(--wrong); }
-
-    #feedback .neutral-stats {
-      color: var(--text-main);
-      font-weight: 400;
-    }
+    #feedback .neutral-stats { color: var(--text-main); font-weight: 400; }
 
     #buttons {
       display: flex;
@@ -311,12 +275,7 @@
     }
 
     #buttons button:active { transform: translateY(1px); }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: default;
-      transform: none;
-    }
+    button:disabled { opacity: 0.45; cursor: default; }
 
     #btn-home {
       margin-top: 32px;
@@ -334,72 +293,52 @@
 
     @media (min-width: 640px) {
       #game { padding: 16px 16px 18px; }
-      #stim-card { min-height: 110px; font-size: 2.4rem; }
-      #rule-overlay-box { min-height: 110px; }
+      #stim-card { font-size: 2.4rem; }
     }
   </style>
 </head>
-
 <body>
   <div id="game">
     <div id="top-bar">
-      <div id="top-bar-main">
-        <h1>Number Match</h1>
-        <p class="subtitle"></p>
-      </div>
+      <h1>Number Match</h1>
       <button id="theme-toggle" type="button">Dark mode</button>
     </div>
 
-    <!-- SETUP -->
     <div id="setup-screen">
       <div id="settings">
         <div class="setting-group">
           <span class="setting-label">Round time</span>
           <label>
-            <input id="input-round-time" type="number"
-                   min="100" max="600000" step="100" value="1300">
+            <input id="input-round-time" type="number" min="100" max="600000" step="100" value="1300">
             <span>ms</span>
           </label>
         </div>
-
         <div class="setting-group">
           <span class="setting-label">Rounds</span>
           <label>
-            <input id="input-rounds" type="number"
-                   min="1" max="9999" step="10" value="20">
+            <input id="input-rounds" type="number" min="1" max="9999" step="10" value="20">
           </label>
         </div>
-
         <div class="setting-group">
           <span class="setting-label">Values</span>
-          <label>
-            min
-            <input id="input-min" type="number" min="1" max="3999" value="1">
-          </label>
-          <label>
-            max
-            <input id="input-max" type="number" min="1" max="3999" value="20">
-          </label>
+          <label>min <input id="input-min" type="number" min="1" max="3999" value="1"></label>
+          <label>max <input id="input-max" type="number" min="1" max="3999" value="20"></label>
         </div>
       </div>
-
       <div id="session-stats"></div>
-
       <button id="btn-start" type="button">Start</button>
     </div>
 
-    <!-- GAME -->
     <div id="game-screen">
       <div id="card-area">
+        <div id="stim-card" class="card-box"></div>
         <div id="rule-overlay">
-          <div id="rule-overlay-box">
+          <div class="card-box">
             <span id="rule-overlay-label">Rule</span>
-            <span id="rule-overlay-text">Loading…</span>
+            <span id="rule-overlay-text"></span>
             <span id="rule-overlay-round"></span>
           </div>
         </div>
-
-        <div id="stim-card" class="card"></div>
       </div>
 
       <div id="status-row">
@@ -407,7 +346,6 @@
           <span>Score: <strong id="score-value">0</strong></span>
           <span id="accuracy">(0 / 0)</span>
         </div>
-        <div id="time">Time: <span id="time-left">–</span></div>
         <div id="round">Round 0 / 0</div>
       </div>
 
@@ -423,36 +361,28 @@
   </div>
 
   <script>
-    "use strict";
+    const MAX_VALUE = 3999;
+    const RULE_PREVIEW_MS = 1000;
+    const SETTINGS_KEY = "nm-settings-v1";
 
-    // ---- Utilities ----
-    const $ = (id) => document.getElementById(id);
+    const ROMAN_NUMERALS = [
+      ["M", 1000], ["CM", 900], ["D", 500], ["CD", 400],
+      ["C", 100], ["XC", 90], ["L", 50], ["XL", 40],
+      ["X", 10], ["IX", 9], ["V", 5], ["IV", 4], ["I", 1]
+    ];
 
-    function clampInt(raw, min, max, fallback) {
-      let n = parseInt(raw, 10);
-      if (Number.isNaN(n)) n = fallback;
-      if (n < min) n = min;
-      if (n > max) n = max;
-      return n;
-    }
+    const EN_UNDER_20 = [
+      "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+      "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+      "seventeen", "eighteen", "nineteen"
+    ];
 
-    function randomInt(maxExclusive) {
-      return Math.floor(Math.random() * maxExclusive);
-    }
-
-    // ---- Number representations ----
-    const GLOBAL_MAX_VALUE = 3999;
+    const EN_TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 
     function toRoman(n) {
-      if (n <= 0 || n > GLOBAL_MAX_VALUE) return null;
-      const romans = [
-        ["M", 1000], ["CM", 900], ["D", 500], ["CD", 400],
-        ["C", 100], ["XC", 90], ["L", 50], ["XL", 40],
-        ["X", 10], ["IX", 9], ["V", 5], ["IV", 4], ["I", 1]
-      ];
-      let result = "";
-      let value = n;
-      for (const [sym, val] of romans) {
+      if (n <= 0 || n > MAX_VALUE) return null;
+      let result = "", value = n;
+      for (const [sym, val] of ROMAN_NUMERALS) {
         while (value >= val) {
           result += sym;
           value -= val;
@@ -461,436 +391,321 @@
       return result;
     }
 
-    const EN_UNDER_20 = [
-      "zero","one","two","three","four","five","six","seven","eight","nine",
-      "ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen",
-      "seventeen","eighteen","nineteen"
-    ];
-    const EN_TENS = [
-      "", "", "twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"
-    ];
-
     function toEnglish(n) {
       if (n < 0 || n > 9999) return null;
       if (n < 20) return EN_UNDER_20[n];
       if (n < 100) {
-        const tens = Math.floor(n / 10);
         const rest = n % 10;
-        return rest ? `${EN_TENS[tens]}-${EN_UNDER_20[rest]}` : EN_TENS[tens];
+        return rest ? `${EN_TENS[n / 10 | 0]}-${EN_UNDER_20[rest]}` : EN_TENS[n / 10 | 0];
       }
       if (n < 1000) {
-        const hundreds = Math.floor(n / 100);
         const rest = n % 100;
-        const base = `${EN_UNDER_20[hundreds]} hundred`;
+        const base = `${EN_UNDER_20[n / 100 | 0]} hundred`;
         return rest ? `${base} ${toEnglish(rest)}` : base;
       }
-      const thousands = Math.floor(n / 1000);
       const rest = n % 1000;
-      const base = `${toEnglish(thousands)} thousand`;
+      const base = `${toEnglish(n / 1000 | 0)} thousand`;
       return rest ? `${base} ${toEnglish(rest)}` : base;
     }
 
-    function buildRepresentations(minValue, maxValue) {
+    function buildRepresentations(min, max) {
       const reps = [];
-      for (let value = minValue; value <= maxValue; value++) {
-        reps.push({ value, text: String(value), system: "Arabic" });
-
-        const roman = toRoman(value);
-        if (roman) reps.push({ value, text: roman, system: "Roman" });
-
-        const english = toEnglish(value);
-        if (english) reps.push({ value, text: english, system: "English" });
+      for (let v = min; v <= max; v++) {
+        reps.push({ value: v, text: String(v), system: "Arabic" });
+        const roman = toRoman(v);
+        if (roman) reps.push({ value: v, text: roman, system: "Roman" });
+        const english = toEnglish(v);
+        if (english) reps.push({ value: v, text: english, system: "English" });
       }
       return reps;
     }
 
-    // ---- DOM ----
-    const ui = {
-      body: document.body,
+    const $ = id => document.getElementById(id);
+    const body = document.body;
+    const setupScreen = $("setup-screen");
+    const gameScreen = $("game-screen");
+    const roundTimeInput = $("input-round-time");
+    const roundsInput = $("input-rounds");
+    const minValueInput = $("input-min");
+    const maxValueInput = $("input-max");
+    const stimCardEl = $("stim-card");
+    const btnSame = $("btn-same");
+    const btnDifferent = $("btn-different");
+    const scoreValueEl = $("score-value");
+    const accuracyEl = $("accuracy");
+    const feedbackEl = $("feedback");
+    const roundEl = $("round");
+    const ruleOverlay = $("rule-overlay");
+    const ruleOverlayText = $("rule-overlay-text");
+    const ruleOverlayRound = $("rule-overlay-round");
+    const sessionStatsEl = $("session-stats");
+    const themeToggleBtn = $("theme-toggle");
 
-      setupScreen: $("setup-screen"),
-      gameScreen: $("game-screen"),
-
-      roundTimeInput: $("input-round-time"),
-      roundsInput: $("input-rounds"),
-      minValueInput: $("input-min"),
-      maxValueInput: $("input-max"),
-
-      btnStart: $("btn-start"),
-      btnHome: $("btn-home"),
-      btnSame: $("btn-same"),
-      btnDifferent: $("btn-different"),
-
-      stimCard: $("stim-card"),
-
-      scoreValue: $("score-value"),
-      accuracy: $("accuracy"),
-      feedback: $("feedback"),
-      round: $("round"),
-      timeLeft: $("time-left"),
-
-      ruleOverlay: $("rule-overlay"),
-      ruleOverlayText: $("rule-overlay-text"),
-      ruleOverlayRound: $("rule-overlay-round"),
-
-      sessionStats: $("session-stats"),
-      themeToggle: $("theme-toggle")
+    let config = { roundTimeMs: 1300, rounds: 20, minValue: 1, maxValue: 20 };
+    let state = {
+      representations: [],
+      currentPair: null,
+      currentRule: "value",
+      score: 0,
+      totalTrials: 0,
+      currentRound: 0,
+      locked: true,
+      trialStartTime: null,
+      sessionRTs: [],
+      roundTimerId: null,
+      roundEndAt: 0,
+      preRoundTimeoutId: null
     };
 
-    // ---- Theme ----
     function applyTheme(mode) {
-      const isDark = mode === "dark";
-      ui.body.classList.toggle("dark-mode", isDark);
-      ui.themeToggle.textContent = isDark ? "Light mode" : "Dark mode";
-      try { localStorage.setItem("nm-theme", mode); } catch (_) {}
+      body.classList.toggle("dark-mode", mode === "dark");
+      themeToggleBtn.textContent = mode === "dark" ? "Light mode" : "Dark mode";
+      try { localStorage.setItem("nm-theme", mode); } catch (e) {}
     }
 
     (function initTheme() {
-      let saved = null;
-      try { saved = localStorage.getItem("nm-theme"); } catch (_) {}
-      applyTheme(saved === "dark" ? "dark" : "light");
+      try { applyTheme(localStorage.getItem("nm-theme") === "dark" ? "dark" : "light"); } catch (e) { applyTheme("light"); }
     })();
 
-    ui.themeToggle.addEventListener("click", () => {
-      applyTheme(ui.body.classList.contains("dark-mode") ? "light" : "dark");
+    themeToggleBtn.addEventListener("click", () => {
+      applyTheme(body.classList.contains("dark-mode") ? "light" : "dark");
     });
-
-    // ---- Settings persistence ----
-    const SETTINGS_KEY = "nm-settings-v1";
 
     function loadSettings() {
       try {
-        const raw = localStorage.getItem(SETTINGS_KEY);
-        if (!raw) return;
-        const s = JSON.parse(raw);
-        if (!s || typeof s !== "object") return;
-
-        if (typeof s.roundTimeMs === "number") ui.roundTimeInput.value = s.roundTimeMs;
-        if (typeof s.rounds === "number") ui.roundsInput.value = s.rounds;
-        if (typeof s.min === "number") ui.minValueInput.value = s.min;
-        if (typeof s.max === "number") ui.maxValueInput.value = s.max;
-      } catch (_) {}
+        const s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+        if (s) {
+          if (s.roundTimeMs) roundTimeInput.value = s.roundTimeMs;
+          if (s.rounds) roundsInput.value = s.rounds;
+          if (s.min) minValueInput.value = s.min;
+          if (s.max) maxValueInput.value = s.max;
+        }
+      } catch (e) {}
     }
 
-    function saveSettings(config) {
-      try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(config)); } catch (_) {}
+    function saveSettings() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+          roundTimeMs: config.roundTimeMs, rounds: config.rounds,
+          min: config.minValue, max: config.maxValue
+        }));
+      } catch (e) {}
     }
 
     loadSettings();
 
-    // ---- Game state ----
-    const RULE_PREVIEW_MS = 1000;
-    const NEXT_ROUND_DELAY_MS = 700;
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
 
-    const state = {
-      configRoundTimeMs: 1300,
-      configRounds: 20,
-      configMinValue: 1,
-      configMaxValue: 20,
+    function pickRandomPair() {
+      const pool = state.representations;
+      if (pool.length < 2) return null;
+      const i = Math.random() * pool.length | 0;
+      let j;
+      do { j = Math.random() * pool.length | 0; } while (j === i);
+      return [pool[i], pool[j]];
+    }
 
-      representations: [],
-
-      currentPair: null,
-      currentRule: "value", // "value" | "category"
-
-      score: 0,
-      totalTrials: 0,
-      currentRound: 0,
-
-      lockInput: true,
-
-      trialStartTime: null,
-      sessionRTs: [],
-
-      roundTimerId: null,
-      roundEndAt: 0,
-
-      preRoundTimeoutId: null
-    };
-
-    // ---- UI helpers ----
-    function setFeedback(text, cls) {
-      ui.feedback.textContent = text || "";
-      ui.feedback.className = cls || "";
+    function clearTimers() {
+      if (state.roundTimerId) { clearInterval(state.roundTimerId); state.roundTimerId = null; }
+      if (state.preRoundTimeoutId) { clearTimeout(state.preRoundTimeoutId); state.preRoundTimeoutId = null; }
     }
 
     function setButtonsEnabled(enabled) {
-      ui.btnSame.disabled = !enabled;
-      ui.btnDifferent.disabled = !enabled;
-      state.lockInput = !enabled;
+      btnSame.disabled = btnDifferent.disabled = !enabled;
+      state.locked = !enabled;
     }
 
     function updateScoreboard() {
-      ui.scoreValue.textContent = String(state.score);
-      ui.accuracy.textContent = `(${state.score} / ${state.totalTrials})`;
-      ui.round.textContent = `Round ${state.currentRound} / ${state.configRounds}`;
-    }
-
-    function renderPair() {
-      const [left, right] = state.currentPair;
-      ui.stimCard.textContent = `${left.text} - ${right.text}`;
+      scoreValueEl.textContent = state.score;
+      accuracyEl.textContent = `(${state.score} / ${state.totalTrials})`;
+      roundEl.textContent = `Round ${state.currentRound} / ${config.rounds}`;
     }
 
     function getAverageRT() {
       if (!state.sessionRTs.length) return null;
-      const sum = state.sessionRTs.reduce((a, b) => a + b, 0);
-      return Math.round(sum / state.sessionRTs.length);
+      return Math.round(state.sessionRTs.reduce((a, b) => a + b, 0) / state.sessionRTs.length);
     }
 
-    function updateHomeStatsText() {
+    function updateHomeStats() {
       const avg = getAverageRT();
-      ui.sessionStats.textContent = avg == null ? "" : `Last session average: ${avg} ms`;
-    }
-
-    // ---- Timer ----
-    function updateTimeDisplay(ms) {
-      const safe = Math.max(0, ms);
-      ui.timeLeft.textContent = (safe / 1000).toFixed(1) + "s";
-    }
-
-    function stopTimer() {
-      if (state.roundTimerId) {
-        clearInterval(state.roundTimerId);
-        state.roundTimerId = null;
-      }
+      sessionStatsEl.textContent = avg != null ? `Last session average: ${avg} ms` : "";
     }
 
     function startTimer() {
-      state.roundEndAt = Date.now() + state.configRoundTimeMs;
-      updateTimeDisplay(state.configRoundTimeMs);
-
-      stopTimer();
+      state.roundEndAt = Date.now() + config.roundTimeMs;
       state.roundTimerId = setInterval(() => {
-        const remaining = state.roundEndAt - Date.now();
-        if (remaining <= 0) {
-          stopTimer();
-          updateTimeDisplay(0);
+        if (Date.now() >= state.roundEndAt) {
+          clearInterval(state.roundTimerId);
+          state.roundTimerId = null;
           handleTimeUp();
-        } else {
-          updateTimeDisplay(remaining);
         }
       }, 100);
     }
 
     function handleTimeUp() {
-      if (state.lockInput || !state.currentPair) return;
-
-      setButtonsEnabled(false);
-      state.totalTrials += 1;
+      if (state.locked || !state.currentPair) return;
+      state.locked = true;
+      state.totalTrials++;
       updateScoreboard();
       finishTrial();
     }
 
-    // ---- Rule / round control ----
-    function pickRule() {
+    function showRuleOverlay(nextRound) {
       state.currentRule = Math.random() < 0.5 ? "value" : "category";
-      ui.ruleOverlayText.textContent = state.currentRule === "value" ? "Same VALUE?" : "Same CATEGORY?";
-    }
-
-    function showRuleOverlay(nextRoundNumber) {
-      pickRule();
-      ui.ruleOverlayRound.textContent = `Round ${nextRoundNumber} of ${state.configRounds}`;
-      ui.ruleOverlay.style.display = "flex";
-      ui.stimCard.style.display = "none";
+      ruleOverlayText.textContent = state.currentRule === "value" ? "Same VALUE?" : "Same CATEGORY?";
+      ruleOverlayRound.textContent = `Round ${nextRound} of ${config.rounds}`;
+      ruleOverlay.style.display = "flex";
     }
 
     function hideRuleOverlay() {
-      ui.ruleOverlay.style.display = "none";
-      ui.stimCard.style.display = "flex";
-    }
-
-    function pickRandomPair() {
-      const pool = state.representations;
-      if (pool.length < 2) return null;
-
-      const i = randomInt(pool.length);
-      let j = randomInt(pool.length);
-      while (j === i) j = randomInt(pool.length);
-
-      return [pool[i], pool[j]];
-    }
-
-    function clearPendingRoundTimeout() {
-      if (state.preRoundTimeoutId) {
-        clearTimeout(state.preRoundTimeoutId);
-        state.preRoundTimeoutId = null;
-      }
+      ruleOverlay.style.display = "none";
     }
 
     function newRound() {
-      setFeedback("", "");
+      feedbackEl.textContent = "";
+      feedbackEl.className = "";
 
-      if (state.currentRound >= state.configRounds) {
-        endGame();
-        return;
-      }
+      if (state.currentRound >= config.rounds) { endGame(); return; }
 
-      stopTimer();
-      clearPendingRoundTimeout();
-
+      clearTimers();
       state.currentPair = null;
       setButtonsEnabled(false);
 
-      ui.stimCard.textContent = "…";
-      updateTimeDisplay(state.configRoundTimeMs);
-
-      const nextRoundNumber = state.currentRound + 1;
-      showRuleOverlay(nextRoundNumber);
-
+      showRuleOverlay(state.currentRound + 1);
       state.preRoundTimeoutId = setTimeout(startRoundAfterPreview, RULE_PREVIEW_MS);
     }
 
     function startRoundAfterPreview() {
       state.preRoundTimeoutId = null;
-      hideRuleOverlay();
 
       const pair = pickRandomPair();
       if (!pair) {
-        ui.stimCard.textContent = "?";
-        setFeedback("No valid numbers in this range.", "incorrect");
-        setButtonsEnabled(false);
+        hideRuleOverlay();
+        stimCardEl.textContent = "?";
+        feedbackEl.textContent = "No valid numbers in this range.";
+        feedbackEl.className = "incorrect";
         return;
       }
 
       state.currentPair = pair;
-      state.currentRound += 1;
+      state.currentRound++;
       state.trialStartTime = Date.now();
 
-      renderPair();
+      // Set content BEFORE hiding overlay
+      stimCardEl.textContent = `${pair[0].text} - ${pair[1].text}`;
+      hideRuleOverlay();
+
       updateScoreboard();
       setButtonsEnabled(true);
       startTimer();
     }
 
     function finishTrial() {
-      if (state.currentRound >= state.configRounds) endGame();
-      else setTimeout(newRound, NEXT_ROUND_DELAY_MS);
+      if (state.currentRound >= config.rounds) endGame();
+      else setTimeout(newRound, 700);
     }
 
     function endGame() {
-      stopTimer();
-      clearPendingRoundTimeout();
-
+      clearTimers();
       hideRuleOverlay();
       setButtonsEnabled(false);
-
-      ui.timeLeft.textContent = "–";
-      ui.round.textContent = `Round ${state.currentRound} / ${state.configRounds} (done)`;
+      roundEl.textContent = `Round ${state.currentRound} / ${config.rounds} (done)`;
 
       const avg = getAverageRT();
-      const base = ui.feedback.textContent.trim();
+      let html = feedbackEl.textContent.trim();
+      html = html ? html + " Session complete." : "Session complete.";
+      if (avg != null) html += `<span class="neutral-stats"> Average: ${avg} ms</span>`;
+      feedbackEl.innerHTML = html;
 
-      let html = base ? base + "  Session complete." : "Session complete.";
-      if (avg != null) html += `<span class="neutral-stats"> Last session average: ${avg} ms</span>`;
-      ui.feedback.innerHTML = html;
-
-      updateHomeStatsText();
+      updateHomeStats();
     }
 
-    // ---- Answers ----
     function handleAnswer(userThinksSame) {
-      if (state.lockInput || !state.currentPair) return;
-
+      if (state.locked || !state.currentPair) return;
       setButtonsEnabled(false);
-      stopTimer();
+      clearTimers();
 
       const [left, right] = state.currentPair;
-      const actualSame = (state.currentRule === "value")
+      const actualSame = state.currentRule === "value"
         ? left.value === right.value
         : left.system === right.system;
 
-      state.totalTrials += 1;
+      state.totalTrials++;
 
       if (state.trialStartTime != null) {
-        const rt = Date.now() - state.trialStartTime;
-        if (!Number.isNaN(rt) && rt >= 0) state.sessionRTs.push(rt);
+        state.sessionRTs.push(Date.now() - state.trialStartTime);
         state.trialStartTime = null;
       }
 
       const correct = userThinksSame === actualSame;
-
       if (correct) {
-        state.score += 1;
-        setFeedback("Correct!", "correct");
+        state.score++;
+        feedbackEl.textContent = "Correct!";
+        feedbackEl.className = "correct";
       } else {
-        const reason = (state.currentRule === "value")
-          ? (left.value === right.value ? "They are the same value." : "They are not the same value.")
-          : (left.system === right.system ? "They are the same category." : "They are not the same category.");
-        setFeedback("Incorrect – " + reason, "incorrect");
+        const sameText = state.currentRule === "value" ? "value" : "category";
+        const isSame = state.currentRule === "value" ? left.value === right.value : left.system === right.system;
+        feedbackEl.textContent = `Incorrect – They are ${isSame ? "" : "not "}the same ${sameText}.`;
+        feedbackEl.className = "incorrect";
       }
 
       updateScoreboard();
       finishTrial();
     }
 
-    // ---- Session setup ----
-    function readConfigFromInputs() {
-      state.configRoundTimeMs = clampInt(ui.roundTimeInput.value, 100, 600000, 1300);
-      ui.roundTimeInput.value = state.configRoundTimeMs;
+    function readConfig() {
+      let t = parseInt(roundTimeInput.value, 10) || 1300;
+      config.roundTimeMs = clamp(t, 100, 600000);
+      roundTimeInput.value = config.roundTimeMs;
 
-      state.configRounds = clampInt(ui.roundsInput.value, 1, 9999, 20);
-      ui.roundsInput.value = state.configRounds;
+      let r = parseInt(roundsInput.value, 10) || 20;
+      config.rounds = clamp(r, 1, 9999);
+      roundsInput.value = config.rounds;
 
-      let min = clampInt(ui.minValueInput.value, 1, GLOBAL_MAX_VALUE, 1);
-      let max = clampInt(ui.maxValueInput.value, 1, GLOBAL_MAX_VALUE, 20);
+      let min = parseInt(minValueInput.value, 10) || 1;
+      let max = parseInt(maxValueInput.value, 10) || 20;
       if (min > max) [min, max] = [max, min];
+      config.minValue = clamp(min, 1, MAX_VALUE);
+      config.maxValue = clamp(max, 1, MAX_VALUE);
+      minValueInput.value = config.minValue;
+      maxValueInput.value = config.maxValue;
 
-      state.configMinValue = min;
-      state.configMaxValue = max;
-
-      ui.minValueInput.value = min;
-      ui.maxValueInput.value = max;
-
-      state.representations = buildRepresentations(min, max);
-
-      saveSettings({
-        roundTimeMs: state.configRoundTimeMs,
-        rounds: state.configRounds,
-        min: state.configMinValue,
-        max: state.configMaxValue
-      });
+      state.representations = buildRepresentations(config.minValue, config.maxValue);
+      saveSettings();
     }
 
     function startSession() {
-      readConfigFromInputs();
-
-      state.score = 0;
-      state.totalTrials = 0;
-      state.currentRound = 0;
-      state.currentPair = null;
-      state.trialStartTime = null;
-      state.sessionRTs = [];
-      state.lockInput = true;
-
-      setFeedback("", "");
+      readConfig();
+      Object.assign(state, {
+        score: 0,
+        totalTrials: 0,
+        currentRound: 0,
+        currentPair: null,
+        trialStartTime: null,
+        sessionRTs: []
+      });
+      feedbackEl.textContent = "";
+      feedbackEl.className = "";
+      stimCardEl.textContent = "";
       updateScoreboard();
-      updateTimeDisplay(state.configRoundTimeMs);
-      ui.stimCard.textContent = "";
-
-      ui.setupScreen.style.display = "none";
-      ui.gameScreen.style.display = "block";
-
+      setupScreen.style.display = "none";
+      gameScreen.style.display = "block";
       newRound();
     }
 
     function returnToSetup() {
-      stopTimer();
-      clearPendingRoundTimeout();
-
+      clearTimers();
       hideRuleOverlay();
       setButtonsEnabled(false);
-
-      updateHomeStatsText();
-
-      ui.setupScreen.style.display = "block";
-      ui.gameScreen.style.display = "none";
+      updateHomeStats();
+      setupScreen.style.display = "block";
+      gameScreen.style.display = "none";
     }
 
-    // ---- Events ----
-    ui.btnStart.addEventListener("click", startSession);
-    ui.btnSame.addEventListener("click", () => handleAnswer(true));
-    ui.btnDifferent.addEventListener("click", () => handleAnswer(false));
-    ui.btnHome.addEventListener("click", returnToSetup);
+    $("btn-start").addEventListener("click", startSession);
+    btnSame.addEventListener("click", () => handleAnswer(true));
+    btnDifferent.addEventListener("click", () => handleAnswer(false));
+    $("btn-home").addEventListener("click", returnToSetup);
   </script>
 </body>
 </html>
